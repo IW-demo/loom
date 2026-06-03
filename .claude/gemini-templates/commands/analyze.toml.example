@@ -1,0 +1,21 @@
+name = "analyze"
+description = "Load COC Phase 01 (analyze) for the current workspace"
+prompt = """
+Load phase 01 (analyze) for the current workspace.
+
+Read:
+- CLAUDE.md at repo root (CC baseline)
+- GEMINI.md at repo root (Gemini baseline — same rule set, Gemini delegation syntax)
+- The workspace's brief at workspaces/<active>/01-brief/*.md
+- specs/_index.md — identify relevant spec files for this analysis
+
+Output:
+- workspaces/<active>/02-plans/analyze.md with:
+  - Failure-point identification (use @analyst)
+  - Requirements breakdown
+  - Identified constraints
+  - Exit condition for phase
+
+Phase transitions are structural human gates. Do not proceed to /todos without explicit user approval of the analyze.md output.
+"""
+tools = ["read_file", "glob", "grep_search", "list_directory"]

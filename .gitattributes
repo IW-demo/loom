@@ -1,0 +1,26 @@
+# Multi-operator COC merge driver registration (Shard M6 D §5.1).
+#
+# The forest-ledger artifact lives at:
+#   <repo>/.session-notes.shared.md
+#   <repo>/workspaces/<name>/.session-notes.shared.md
+#
+# When two operators concurrently edit the shared ledger and their
+# branches merge, the default git text-merge produces conflict markers
+# the line-by-line driver cannot resolve correctly (per-row attribution
+# is lost; rows reorder unpredictably). The coc-ledger driver parses
+# the markdown table by header+separator detection, merges per-row by
+# stable ID column, and produces per-row conflict markers naming the
+# conflicting owners — preserving attribution that line-merge destroys.
+#
+# To activate the driver, each operator MUST register it once per clone:
+#   git config merge.coc-ledger.name  "COC forest-ledger 3-way merge"
+#   git config merge.coc-ledger.driver ".claude/hooks/lib/coc-ledger.js %O %A %B %P"
+#
+# The .gitattributes entries below bind the file pattern to the driver
+# name; the per-clone git-config above binds the name to the command.
+# This split is the standard git pattern (attributes are tracked;
+# driver commands are clone-local for security — a driver line in
+# .gitattributes alone cannot execute arbitrary code on clone).
+
+.session-notes.shared.md merge=coc-ledger
+workspaces/*/.session-notes.shared.md merge=coc-ledger

@@ -1,0 +1,125 @@
+# Child repositories (each has its own git repo)
+kailash-py/
+kailash-rs/
+kailash-coc-claude-py/
+kailash-coc-claude-rs/
+kailash-coc-claude-rb/
+kailash-coc-claude-prism/
+kailash-coc-py/
+kailash-coc-rs/
+kailash-prism/
+coc-base/
+coc-claude-base/
+kaizen-cli-py/
+kaizen-cli-rs/
+kz-engage/
+
+# Environment and OS
+.env
+.DS_Store
+
+# Session notes + workspaces — TRACKED for the team (co-owner directive
+# 2026-05-31): loom is now a multi-operator TEAM-LEVEL implementation (PRIVATE
+# repo), so session notes + workspace institutional knowledge are committed so
+# the whole team sees them — they are shared team knowledge, not transient
+# operator-local state. (Superseded the pre-2026-05-31 "loom is artifact-mgmt-
+# only / operator state stays in operator clones" rationale; aligns with
+# feedback_commit_workspaces_for_team.) The `.session-notes.shared.md` forest
+# ledger is reconciled by the coc-ledger merge driver (.gitattributes) on
+# concurrent edits; per-operator `.session-notes.d/<display_id>.md` fragments
+# are each one operator's, tracked for team visibility per knowledge-
+# convergence.md Rule 1.
+#
+# Secrets are STILL never tracked: `.env` (line 18 above, a global rule that
+# still excludes any workspaces/**/.env) + any credential/key file.
+
+# Stray tilde-directory from mis-expanded "~" paths (tools emitting literal "~/" as a dir)
+~/
+.claude/test-harness/results/
+.claude/scheduled_tasks.lock
+.claude/logs/
+.claude/learning/.autocommit.lock
+# F40 Stage 1 (2026-05-26) — disclosure-class containment matching tenant-repo/loom#92.
+# Telemetry under .claude/learning/ carries operator-correlatable institutional
+# metadata: full paths, session IDs, PR numbers + SHAs, gh --repo references,
+# regex bypass attempts, timestamps. Same disclosure class as loom-links.local.json
+# (issue #255/#252). Per-clone state per multi-operator-coordination.md MUST NOT
+# "state is per-repo and per-clone"; cross-clone propagation via main-push was
+# the coc-telemetry-autocommit.js path now removed.
+.claude/learning/observations.jsonl
+.claude/learning/violations.jsonl
+.claude/learning/posture.json
+.claude/learning/.initialized
+.claude/learning/learning-codified.json
+.claude/learning/learning-digest.json
+# Per-clone coordination + lease + cache state — mirrors the hook-owned-state
+# set in .claude/settings.json::permissions.deny. coordination-log.jsonl carries
+# the genesis-anchor trust root; these are per-clone, never committed
+# (multi-operator-coordination.md MUST NOT "state is per-repo and per-clone").
+# coordination-log.jsonl was the enumeration-drift gap surfaced at F19 genesis
+# enrollment (2026-05-27): present on disk, deny-listed in settings, but missing
+# from this list — so the dir surfaced as untracked-and-unignored.
+.claude/learning/coordination-log.jsonl
+.claude/learning/codify-lease.json
+.claude/learning/.heartbeat-cache*
+.claude/learning/.session-end-cache*
+# F101-2 (2026-06-01) — per-session decision-provenance ledgers (loom#411 loom
+# lane). Operator-attributed, prompt/command/Task-prompt commitments + session
+# IDs + file paths; the degraded-LOCAL half of the loom↔csq seam (csq drains +
+# signs them). Same per-clone, never-committed state class as coordination-log.
+.claude/learning/provenance/
+# F40-4 PII survey evidence file — aggregate counts only, but contains
+# survey methodology that could re-enable re-correlation if leaked.
+SURVEY-F40-4-2026-05-26.evidence.md
+# F40 Stage 1b (redteam-found): sibling test-harness telemetry — same
+# disclosure class as .claude/learning/observations.jsonl above; not
+# covered by that line because the path prefix differs.
+.claude/test-harness/.claude/learning/
+# observations.archive/ is auto-created by .claude/hooks/lib/learning-utils.js
+# at ensureLearningDir() time; gitignore explicitly so future writes to
+# the archive directory don't slip into staging.
+.claude/learning/observations.archive/
+# (Maintainer internal session-file ignore patterns are omitted from the
+# public release — they collide with framework filenames on case-insensitive
+# filesystems and reference internal working files that are not published.)
+# Operator-local agent worktrees (each .claude/worktrees/agent-<hash>/ is a
+# full repo checkout the worktree-isolation primitive in rules/worktree-
+# isolation.md creates for parallel agent waves). Worktree contents are
+# transient scratch space; never enter git/sync. Pairs with the scanner's
+# isNeverSynced exclusion (.claude/bin/scan-synced-disclosure.mjs) + the
+# sync-manifest.yaml::exclude entry — three layers of defense-in-depth.
+.claude/worktrees/
+# Shard M6 D + M7 state — operator-local coordination state.
+# codify-lease.json (M7 E): per-clone lease for /codify concurrency;
+# binds a person_id to a scope at lease-acquire time. MUST NOT enter
+# git/sync — operator-binding state mixes provenance + identity.
+.claude/learning/codify-lease.json
+# session-end-cache + heartbeat-cache (M5 iter-6): per-clone transient
+# coordination state. Already covered by STATE_PATH_RX deny matrix at
+# the hook layer; gitignore entries make the .gitignore-side defense
+# explicit so a future contributor doesn't `git add -A` them in.
+.claude/learning/.session-end-cache
+.claude/learning/.heartbeat-cache
+# Operator-local downstream-repo registry for repin-downstream.mjs (issue #255).
+# The .example template is committed; the real registry is local-only and
+# MUST NOT enter git/sync (it correlates every engagement in one file).
+.claude/bin/repin-targets.local.json
+# why: operator-local linked-repo registry for loom's linkage system
+# (loom-links.mjs / Phase-2). The .example schema is committed; this real
+# registry is local-only and MUST NOT enter git/sync (it correlates every
+# linked repo path/org in one file — issue #255 / #252 disclosure class).
+.claude/bin/loom-links.local.json
+# Operator-local ci-runners values for the rs CI runbook (issue #260).
+# The .example schema is committed; the real values are local-only and
+# MUST NOT enter git/sync (runner hostnames + enterprise org slug + service label).
+.claude/variants/rs/rules/ci-runners.operator.local.md
+# Operator-local ci-runners values for the py CI runbook (issue #260).
+# The .example schema is committed; the real values are local-only and
+# MUST NOT enter git/sync (runner hostnames + org-derived runner label).
+.claude/variants/py/rules/ci-runners.operator.local.md
+# Per-clone operator-identity cache populated by .claude/hooks/lib/operator-id.js
+# (shard A1). Hint-only — the resolver re-derives from the signing key +
+# roster on absence / corruption / fingerprint mismatch. Local-only and
+# MUST NOT enter git/sync (binds a per-emitter signing-key fingerprint
+# to that person's roster entry).
+.claude/operator-id

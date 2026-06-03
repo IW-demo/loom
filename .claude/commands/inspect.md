@@ -1,0 +1,31 @@
+---
+description: "Cross-repository code inspection and analysis"
+---
+
+Perform code inspection and analysis across Kailash ecosystem repos.
+
+**Usage**: `/inspect [type] [where]`
+
+- `type`: `coc`, `drift`, `deps`, `quality`, `secrets`, `git`
+- `where`: `py`, `rs`, `all`, or a specific repo path
+
+## Inspection Types
+
+| Type      | What it checks                                              |
+| --------- | ----------------------------------------------------------- |
+| `coc`     | COC artifact sync freshness and variant compliance          |
+| `drift`   | Diff BUILD repo artifacts against expected state from loom/ |
+| `deps`    | Dependency versions, conflicts, outdated packages           |
+| `quality` | TODO/FIXME markers, hardcoded secrets, dead code            |
+| `secrets` | Scan for hardcoded secrets and credential patterns          |
+| `git`     | Git status, branch info, uncommitted changes                |
+
+## Delegate
+
+Use **repo-ops** agent for execution. The agent MUST resolve every target repo's on-disk path via `bin/lib/loom-links.mjs` (`resolveAll` / `resolveRepo` — canonical NAME→location binding, `cross-repo.md` MUST-1), never a positional `~/repos/<name>` / `../<name>` guess. Repos without a declared linkage are reported as not-linked, not positional-searched.
+
+## Examples
+
+- `/inspect coc all` — Check COC sync freshness across all repos
+- `/inspect drift py` — Show artifact drift in kailash-py vs loom/ source
+- `/inspect secrets all` — Scan all repos for hardcoded secrets

@@ -1,0 +1,36 @@
+name = "settings"
+description = "Apply or inspect Claude Code settings globally or per-project (MCP servers, permissions, hooks)"
+prompt = '''
+Manage Claude Code settings across global config and project repos.
+
+**Usage**: `/settings [action] [scope] [details]`
+
+- `action`: `apply`, `inspect`, `diff`, `remove`
+- `scope`: `global`, `project <repo>`, `bulk <pattern>`
+- `details`: What to configure (e.g., "playwright mcp", "permissions")
+
+## Delegate
+
+Use **settings-manager** agent for execution.
+
+## Settings Levels
+
+| Level   | File                               | Scope        |
+| ------- | ---------------------------------- | ------------ |
+| Global  | `~/.claude/settings.json`          | All projects |
+| Project | `REPO/.claude/settings.json`       | Shared (git) |
+| Local   | `REPO/.claude/settings.local.json` | User only    |
+
+## Safety
+
+- Always preview changes before applying
+- Validate JSON after every write
+- Never silently overwrite — show diff first
+
+## Examples
+
+- `/settings inspect global` — Show current global settings
+- `/settings apply project kailash-py playwright mcp` — Add MCP to a project
+- `/settings diff project kailash-rs` — Show settings diff vs template
+'''
+tools = ["read_file", "glob", "grep_search", "list_directory", "run_shell_command", "write_file"]

@@ -1,0 +1,32 @@
+name = "inspect"
+description = "Cross-repository code inspection and analysis"
+prompt = '''
+Perform code inspection and analysis across Kailash ecosystem repos.
+
+**Usage**: `/inspect [type] [where]`
+
+- `type`: `coc`, `drift`, `deps`, `quality`, `secrets`, `git`
+- `where`: `py`, `rs`, `all`, or a specific repo path
+
+## Inspection Types
+
+| Type      | What it checks                                              |
+| --------- | ----------------------------------------------------------- |
+| `coc`     | COC artifact sync freshness and variant compliance          |
+| `drift`   | Diff BUILD repo artifacts against expected state from loom/ |
+| `deps`    | Dependency versions, conflicts, outdated packages           |
+| `quality` | TODO/FIXME markers, hardcoded secrets, dead code            |
+| `secrets` | Scan for hardcoded secrets and credential patterns          |
+| `git`     | Git status, branch info, uncommitted changes                |
+
+## Delegate
+
+Use **repo-ops** agent for execution.
+
+## Examples
+
+- `/inspect coc all` — Check COC sync freshness across all repos
+- `/inspect drift py` — Show artifact drift in kailash-py vs loom/ source
+- `/inspect secrets all` — Scan all repos for hardcoded secrets
+'''
+tools = ["read_file", "glob", "grep_search", "list_directory", "run_shell_command", "write_file"]

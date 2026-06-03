@@ -1,0 +1,67 @@
+<!-- slot:examples -->
+
+## Examples
+
+### Quality Gates — Background Agent Pattern
+
+```
+@reviewer
+run_in_background: true
+prompt: "Review all changes since last gate..."
+
+@security-reviewer
+run_in_background: true
+prompt: "Security audit all changes..."
+```
+
+### Reviewer Mechanical Sweeps
+
+```
+# DO — reviewer prompt enumerates mechanical sweeps
+@reviewer
+prompt: |
+  ... diff context ...
+  Mechanical sweeps (run BEFORE LLM judgment):
+  1. Parity grep — every `return TrainingResult(...)` call site must pass `device=...`
+  2. `pytest --collect-only -q` exit 0 across all test dirs
+  3. `pip check` — no new conflicts vs main
+  4. For every public symbol in __all__ added by this PR — verify eager import
+
+# DO NOT — reviewer prompt only includes diff context
+@reviewer
+prompt: "Review the diff between main and feat/X."
+```
+
+### Worktree Isolation for Compiling Agents
+
+```
+# DO
+@ml-specialist
+isolation: worktree
+prompt: "implement feature X..."
+
+# DO NOT: two agents sharing target/ serialize on cargo's exclusive lock
+```
+
+### Worktree Prompts Use Relative Paths Only
+
+```python
+# DO — relative paths, resolve to worktree cwd
+@ml-specialist
+isolation: worktree
+prompt: "Edit packages/kailash-ml/src/kailash_ml/trainable.py..."
+
+# DO NOT — absolute path rooted in parent checkout
+# (writes land in MAIN; worktree empty; auto-cleanup loses the work)
+```
+
+### Verify Agent Deliverables Exist After Exit
+
+```python
+# DO — verify after @agent returns
+read_file("/abs/path/src/feature.py")  # raises if missing → retry
+
+# DO NOT — trust completion message
+```
+
+<!-- /slot:examples -->

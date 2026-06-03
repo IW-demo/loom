@@ -1,0 +1,49 @@
+---
+description: "List repositories and show status overview"
+---
+
+Show an overview of repositories under the loom/ ecosystem.
+
+**Usage**: `/repos [filter]`
+
+- `filter`: Optional — `build`, `template`, `all`, or a specific repo name
+
+## What it shows
+
+For each repo:
+
+- Repository name and path
+- Current branch
+- Clean/dirty status
+- Last commit date
+- Role (BUILD, TEMPLATE, or COC source)
+- Sync freshness (last sync date from .coc-sync-marker)
+
+## Output
+
+Markdown table grouped by role:
+
+```
+## Source (loom/)
+Artifact source of truth. Variant system active.
+
+## BUILD Repos
+| Repo       | Branch | Status | Last Commit | Sync Freshness |
+| ---------- | ------ | ------ | ----------- | -------------- |
+| kailash-py | main   | clean  | 2026-03-29  | Fresh (1h ago) |
+| kailash-rs | main   | dirty  | 2026-03-28  | Stale (3d ago) |
+
+## COC Templates
+| Repo                  | Branch | Status | Last Sync   |
+| --------------------- | ------ | ------ | ----------- |
+| kailash-coc-claude-py | main   | clean  | 2026-03-29  |
+| kailash-coc-claude-rs | main   | clean  | 2026-03-27  |
+```
+
+## Resolution
+
+Repo paths come from `bin/lib/loom-links.mjs` (`resolveAll` — the canonical NAME→location binding, `cross-repo.md` MUST-1), never a positional `~/repos/<name>` scan. The list IS the set of declared linkages; a repo with no declared linkage is shown as not-linked rather than positionally discovered.
+
+## Delegate
+
+Use **repo-ops** agent for execution.

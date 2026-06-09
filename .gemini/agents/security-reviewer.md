@@ -3,7 +3,6 @@ name: security-reviewer
 description: Security vulnerability specialist. Use proactively before commits and for security-sensitive code changes.
 tools:
   - read_file
-  - write_file
   - grep_search
   - glob
   - list_directory

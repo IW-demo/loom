@@ -41,8 +41,8 @@ const pe = require("../../hooks/lib/provenance-event.js");
 
 const ID = {
   verified_id: "DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF",
-  person_id: "pid-example-10e7dd16",
-  display_id: "example",
+  person_id: "pid-maintainer-10e7dd16",
+  display_id: "maintainer",
 };
 const TS = "2026-06-01T12:00:00Z";
 

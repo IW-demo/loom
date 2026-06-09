@@ -39,7 +39,7 @@ const { runEnrollmentCeremony, performMigration } = require(
 const coordinationLog = require(path.join(LIB, "coordination-log.js"));
 
 // Realistic hex SHAs so makeGhApiMock's commits regex (/[a-f0-9]+/) matches.
-const OLD_ROOT = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef";
+const OLD_ROOT = "398076d50733ab74ecba1526969cca8bded3d653";
 const NEW_ROOT = "d98da8b8088ad5afe1e1a0232c18aa41e2db99d9";
 
 // ---------------------------------------------------------------------------

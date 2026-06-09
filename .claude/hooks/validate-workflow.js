@@ -652,7 +652,7 @@ function checkFrontendMockData(content, filePath, messages) {
   // Call patterns: functions that produce synthetic display data
   // Targets: generate*Data/List/Records/Entries/Stats/Metrics/Occupancy/Transactions/Revenue
   //          generateFake*/Mock*/Random*/Sample*/Dummy*
-  //          mockData/Users/Items/Records/Response*
+  //          mockData/Users/<user>/Records/Response*
   const mockFuncCallPattern =
     /\b(generate(?:\w*(?:Data|List|Records|Entries|Stats|Metrics|Occupancy|Transactions|Revenue|Items))|generate(?:Fake|Mock|Random|Sample|Dummy)\w*|mock(?:Data|Users|Items|Records|Response)\w*)\s*\(/;
 

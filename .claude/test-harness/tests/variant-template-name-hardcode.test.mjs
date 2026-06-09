@@ -62,13 +62,9 @@ const ALLOWANCES = {
   // loom #140 (2026-05-11).
   "rs/commands/sync.md": 8,
 
-  // rb consumer-facing /sync command — same drift class as rs sync.md,
-  // but rb has only ONE USE template (kailash-coc-claude-rb) per
-  // sync-manifest.yaml::repos.rb.templates. No multi-CLI rb sibling
-  // exists today; the prose is correct for the single target. Tracked
-  // at #140 follow-up: when a multi-CLI rb USE template lands, this
-  // file MUST be genericized in the same PR that introduces the sibling.
-  "rb/commands/sync.md": 8,
+  // (rb/commands/sync.md entry removed: the rb variant tree was collapsed into
+  // the rs all-bindings template in commit e751529 / #423; the file no longer
+  // exists, so its ALLOWANCES entry was stale. #445 cycle.)
 
   // prism rs branch-protection registry — structural data table listing
   // terrene-foundation/<repo> entries with their protection rules. Repo
@@ -76,12 +72,9 @@ const ALLOWANCES = {
   // facing prose drift.
   "prism/rules/git.md": 3,
 
-  // rb single-template variant metadata — identifies the specific USE
-  // template this overlay applies to. rb has only ONE template, so no
-  // multi-target drift class exists. (Same justification as rb/commands/
-  // sync.md above.)
-  "rb/rules/observability.md": 1,
-  "rb/rules/schema-migration.md": 1,
+  // (rb/rules/observability.md + rb/rules/schema-migration.md entries removed:
+  // same rb→rs fleet collapse as above — commit e751529 / #423 deleted the rb
+  // variant rules tree. Entries were stale. #445 cycle.)
 
   // Cross-SDK procedure pointers — EATP D6 semantic-parity references
   // pointing at the Python sibling SDK's equivalent procedure. The

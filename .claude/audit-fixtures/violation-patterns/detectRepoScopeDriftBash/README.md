@@ -10,4 +10,4 @@ Per `rules/cc-artifacts.md` Rule 9 + `rules/hook-output-discipline.md` MUST-4. E
 | `skip-command-substitution.txt` | `null`            | `gh ... --repo $(...)` — command substitution, detector cannot evaluate, MUST skip (MUST-3)                         |
 | `skip-braced-variable.txt`      | `null`            | `gh ... --repo "${REPO}"` — braced shell variable, MUST skip (MUST-3)                                               |
 
-The cwd for every fixture is `/Users/example/repos/loom` (basename `loom`). `terrene-foundation/kailash-py` is the canonical off-repo string.
+The cwd for every fixture is `/Users/<user>/repos/loom` (basename `loom`). `terrene-foundation/kailash-py` is the canonical off-repo string.

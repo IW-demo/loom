@@ -30,6 +30,17 @@ When multiple independent operations are needed, launch agents in parallel via t
 
 **See also**: `rules/time-pressure-discipline.md` — when the user signals time pressure ("speed up", "deadline looming"), parallelization (parallel specialist delegation, parallel worktree waves of 3) IS the throughput response. Procedure drops are BLOCKED even when the user authorizes them; the structural alternative is more parallel work, not fewer steps.
 
+### MUST: Decompose Onto The Parallel Primitive By Default When The Work Earns It
+
+When the work surface is **≥3 independent items** OR has a **multi-stage shape** (analyze → implement → verify), the orchestrator MUST decompose onto the runtime's parallel orchestration primitive by DEFAULT — not only under `/autonomize`. The trigger is a real gate: a genuinely serial single-item task MUST stay serial. Governance per `rules/governed-throughput.md`; concurrency throttle-aware per `rules/worktree-isolation.md` Rule 4.
+
+```text
+# DO — 3 independent shards → one parallel wave
+# DO NOT — 1 serial rewrite → stay serial
+```
+
+**Why:** Parallel decomposition is the baseline throughput response, not a per-session opt-in; the serial-single-item gate prevents over-decomposition of genuinely sequential work.
+
 ### MUST: Parallel Brief-Claim Verification When Issue Count ≥ 3
 
 When `/analyze` runs against a brief covering ≥ 3 distinct issues / failure modes / workstreams, the orchestrator MUST launch parallel deep-dive verification agents — one per claim cluster — to independently re-grep / re-read every factual claim in the brief tagged with file:line citations. Inaccuracies surfaced by the deep-dive sweep MUST be recorded in the workspace journal AND in the architecture plan's "Brief corrections" section AS THE GATE before `/todos`. Single-agent analysis on a ≥3-issue brief is BLOCKED — the framing inherited from the brief is the failure mode this rule prevents.
@@ -80,11 +91,7 @@ When delegating a /redteam round whose mission includes **closure-parity verific
 
 ## MUST: Worktree Isolation for Compiling Agents
 
-Agents that compile (Rust `cargo`, Python editable installs at scale) MUST use the CLI's worktree-isolation primitive to avoid build-directory lock contention.
-
-(See **Example 6** in the examples slot below for the worktree-isolation invocation pattern.)
-
-**Why:** Cargo holds an exclusive filesystem lock on `target/`. Worktrees give each agent its own `target/`. See `skills/30-claude-code-patterns/worktree-orchestration.md` for the full 5-layer protocol — worktree isolation is necessary but not sufficient.
+Agents that compile (Rust `cargo`, Python editable installs at scale) MUST use the CLI's worktree-isolation primitive — cargo holds an exclusive lock on `target/`, so each agent needs its own. See **Example 6**; `skills/30-claude-code-patterns/worktree-orchestration.md` (full 5-layer protocol — isolation is necessary but not sufficient).
 
 ## MUST: Worktree-Isolate Parallel Agents That Edit Shared Source; Concurrent Readers Read Committed HEAD
 
@@ -96,31 +103,21 @@ The clause above generalizes beyond compilation: ANY background/parallel agent t
 
 ## MUST: Worktree Prompts Use Relative Paths Only
 
-When prompting an agent with worktree isolation, the orchestrator MUST reference files via paths RELATIVE to the repo root — never absolute paths starting with `/Users/` or `/home/`.
+When prompting a worktree-isolated agent, the orchestrator MUST use paths RELATIVE to the repo root — absolute `/Users/`/`/home/` paths point back to the parent checkout and silently defeat isolation (2026-04-19: 300+ LOC lost).
 
-(See **Example 7** in the examples slot below for relative-path discipline.)
-
-**Why:** Worktree isolation sets cwd to the worktree; absolute paths point back to the parent checkout, silently defeating isolation. See guide for 2026-04-19 post-mortem (300+ LOC lost).
+(See **Example 7**; `worktree-orchestration.md` Rule 2.)
 
 ## MUST: Recover Orphan Writes From Zero-Commit Worktree Agents
 
-When a worktree-isolated agent reports completion but the branch has zero commits AND the worktree has been auto-cleaned, the parent MUST inspect the MAIN checkout for orphaned untracked files BEFORE concluding the work was lost. Absolute-path writes from the agent resolve to the MAIN checkout cwd — the files are NOT lost; they are orphaned, uncommitted, and reachable via `git status` on the parent.
-
-**Why:** Re-launching abandons real work every time an absolute-path agent truncates. `git status` reveals the orphans; `recovery/` grep surfaces this class of rescue across history. See guide for full 4-step protocol + PR #574 evidence (1129 LOC of `alignment.py` recovered).
+When a worktree agent reports done but its branch has zero commits and the worktree was auto-cleaned, the parent MUST check the MAIN checkout for orphaned untracked files (`git status`) and recover them on a `recovery/<branch>` branch before concluding work was lost — absolute-path writes resolve to main. Protocol + PR #574 evidence: `skills/30-claude-code-patterns/worktree-orchestration.md` Rule 4a.
 
 ## MUST: Worktree Agents Commit Incremental Progress
 
-Every worktree-isolated agent MUST receive an explicit instruction in its prompt to `git commit` after each milestone. The orchestrator MUST verify the branch has ≥1 commit before declaring the agent's work landed.
-
-(See **Example 8** in the examples slot below for the commit-discipline prompt fragment.)
-
-**Why:** Worktrees with zero commits are silently deleted. See guide for 2026-04-19 three-shard post-mortem.
+Every worktree agent's prompt MUST instruct `git commit` per milestone; the orchestrator MUST verify ≥1 commit before declaring work landed (zero-commit worktrees are auto-deleted). See **Example 8**; `worktree-orchestration.md` Rule 3.
 
 ## MUST: Verify Agent Deliverables Exist After Exit
 
-When an agent reports completion of a file-writing task, the parent MUST `ls` or `Read` the claimed file before trusting the completion claim.
-
-**Why:** Budget exhaustion truncates writes mid-message. The `ls` check is O(1) and converts silent no-op into loud retry.
+After an agent reports a file-writing task done, the parent MUST `ls`/`Read` the claimed file before trusting it — budget exhaustion truncates writes mid-message. `worktree-orchestration.md` Rule 4.
 
 ## MUST: Parallel-Worktree Package Ownership Coordination
 
@@ -371,7 +368,7 @@ Any PR whose diff is metadata-only — version anchors (`pyproject.toml` / `Carg
 
 Before the FIRST `git push` that creates a remote branch, the agent MUST run the project's local CI parity command set (Rust: `cargo +nightly fmt --all --check` + `cargo clippy -- -D warnings` + `cargo nextest run` + `RUSTDOCFLAGS="-Dwarnings" cargo doc`. Python: `pre-commit run --all-files` + `pytest` + `mypy --strict`). All MUST exit 0 → push.
 
-**Why:** With `concurrency: cancel-in-progress: true` on the workflow, prior in-flight runs are cancelled — but **the cancelled runs are still billed for the wall-clock minutes already consumed before cancellation**. Pre-flighting takes ~5-10 min; the alternative is N × 45 min of billed CI per fix-up cycle. See guide for the 71-minute mid-flight cancel evidence.
+**Why:** With `concurrency: cancel-in-progress: true`, prior in-flight runs are cancelled but **still billed for the wall-clock minutes consumed before cancellation**. Pre-flighting takes ~5-10 min; the alternative is N × 45 min of billed CI per fix-up cycle. See guide for the 71-minute mid-flight cancel evidence + the full Rust/Python command set.
 
 ## Branch Protection
 
@@ -385,11 +382,11 @@ CC system prompt provides the template. Always include a `## Related issues` sec
 
 **Why:** Without issue links, PRs become disconnected from their motivation, breaking traceability and preventing automatic issue closure on merge.
 
-## `git reset --hard` MUST Verify Clean Working Tree (MUST)
+## Destructive Working-Tree Ops MUST Verify Clean Working Tree (MUST)
 
-`git reset --hard <ref>` SILENTLY discards every unstaged modification AND every untracked file in the affected paths. Recovery is impossible — unstaged content has no reflog entry. Running `git reset --hard` without first verifying `git status --porcelain` is empty is BLOCKED. Prefer `git reset --keep <ref>`, which performs the same commit-graph operation BUT aborts if it would lose local changes.
+`git reset --hard <ref>`, `git clean -f[d]`, and `rm -rf` of untracked paths all SILENTLY and IRRECOVERABLY destroy uncommitted work — unstaged modifications AND untracked-not-ignored files have NO reflog. Running any without first verifying `git status --porcelain` is empty is BLOCKED. Prefer `git reset --keep <ref>` (aborts on a dirty tree) and `git stash -u` over `git clean -f`. The `.claude/hooks/validate-bash-command.js` tripwire enforces this at the Bash boundary.
 
-**Why:** `git reset --hard` is the most destructive git operation that doesn't rewrite history — and unlike force-push, the destruction is unrecoverable. `git reset --keep` exists in git specifically to provide the same effect with structural safety. Sibling of `dataflow-identifier-safety.md` Rule 4 (DROP) and `schema-migration.md` Rule 7 (downgrade) — same structural-confirmation pattern.
+**Why:** The most destructive working-tree ops that don't rewrite history; unlike force-push the loss is unrecoverable (no reflog). `git reset --keep` / `git clean -n` convert silent loss into a loud refusal/preview. See guide for the #401 incident + the `dataflow-identifier-safety.md` Rule 4 / `schema-migration.md` Rule 7 siblings.
 
 ## Rules
 
@@ -449,9 +446,9 @@ The agent never self-authorizes. But the user owns the operating envelope (`rule
 
 ## Exceptions
 
-NONE the agent may invoke on its own judgment (see § User-Authorized Exception for the only user-initiated path). Descriptive sibling mentions are OK when informational, not prescriptive. The rule does NOT apply at orchestration roots (`~/repos/`, `loom/`) where cross-repo coordination IS the purpose (`/sync`, `/sync-to-build`, `/inspect`, `/repos`).
+NONE the agent may invoke on its own judgment (see § User-Authorized Exception for the only user-initiated path). Descriptive sibling mentions are OK when informational, not prescriptive. The rule does NOT apply at orchestration roots (`~/repos/`, `loom/`) where cross-repo coordination IS the purpose: artifact-distribution (`/sync`, `/sync-to-build`, `/inspect`, `/repos`) AND co-owner-directed cross-repo governance reads (per a User-Authorized Exception grant). **loom is the SOLE carve-out holder**; every downstream consumer is bound by the strict in-repo discipline (a consumer is never an orchestration root). The carve-out lifts the scope boundary for the _operation_ only: a cross-repo WRITE still needs the five conditions, and a cross-repo READ outside artifact-distribution still needs an explicit journaled grant. See extract for the loom-sole-holder rationale + governance-read walkthrough.
 
-Note: at the orchestration root, cross-repo targets are enumerated _explicitly_ via `bin/lib/loom-links.mjs::resolveRepo` / `resolveAll` (per `cross-repo.md` MUST-1) — there is no positional discovery of sibling repos. Explicit enumeration reinforces this in-repo-scope boundary: a session can only reach a repo that the operator declared a linkage for; the orchestration-root carve-out above (`:42`) is unchanged — it lifts the scope boundary for the _operation_, never the resolver requirement.
+Note: at the orchestration root, cross-repo targets are enumerated _explicitly_ via `bin/lib/loom-links.mjs::resolveRepo` / `resolveAll` (per `cross-repo.md` MUST-1) — no positional discovery, governance siblings (`governance.csq`, `governance.aegis`) included. The carve-out lifts the scope boundary for the _operation_, never the resolver requirement.
 
 ---
 
@@ -475,19 +472,19 @@ All database queries MUST use parameterized queries or ORM.
 
 ## Credential Decode Helpers
 
-Connection strings carry credentials in URL-encoded form. Decoding them at a call site with `unquote(parsed.password)` is BLOCKED — every decode site MUST route through a shared helper module so validation logic lives in one place.
+Connection strings carry credentials URL-encoded; every decode site MUST route through a shared helper module. Call-site `unquote(parsed.password)` is BLOCKED.
 
 ### 1. Null-Byte Rejection At Every Credential Decode Site (MUST)
 
 Every URL parsing site that extracts `user`/`password` from `urlparse(connection_string)` MUST route through a single shared helper that rejects null bytes after percent-decoding. Hand-rolled `unquote(parsed.password)` at a call site is BLOCKED.
 
-**Why:** A crafted `mysql://user:%00bypass@host/db` decodes to `\x00bypass`; the MySQL C client truncates credentials at the first null byte and the driver sends an empty password. Drift between sites with/without the check is unauditable without a single helper. See guide for full evidence.
+**Why:** A crafted `mysql://user:%00bypass@host/db` decodes to `\x00bypass`, which the MySQL C client truncates to an empty password. See guide for full evidence.
 
 ### 2. Pre-Encoder Consolidation (MUST)
 
 Password pre-encoding helpers (`quote_plus` of `#$@?` etc.) MUST live in the same shared helper module as the decode path. Per-adapter copies are BLOCKED.
 
-**Why:** Encode and decode are dual halves of one contract; splitting them across modules guarantees one half drifts. Round-trip tests are only meaningful when both ends share the helper.
+**Why:** Encode and decode are dual halves of one contract; splitting them across modules guarantees one half drifts.
 
 ## Input Validation
 
@@ -523,13 +520,13 @@ DataFlow's input sanitizer (`packages/kailash-dataflow/src/dataflow/core/nodes.p
 
 For declared-string fields, the sanitizer MUST replace dangerous SQL keyword sequences with grep-able sentinel tokens (`STATEMENT_BLOCKED`, `DROP_TABLE`, `UNION_SELECT`, etc.). Quote-escaping (`'` → `''`) is BLOCKED.
 
-**Why:** Token-replace makes attacker intent grep-able post-incident (`grep STATEMENT_BLOCKED audit.log`). Quote-escape preserves the payload as data, masking the attack. Sanitizer is the audit trail; parameter binding is the defense.
+**Why:** Token-replace makes attacker intent grep-able post-incident (`grep STATEMENT_BLOCKED audit.log`); quote-escape preserves the payload as data, masking the attack.
 
 ### 2. Type-Confusion MUST Raise, Not Silently Coerce
 
 For declared-string fields receiving `dict` / `list` / `set` / `tuple` values, the sanitizer MUST raise `ValueError("parameter type mismatch: …")`. Silent coercion via `str(value)` is BLOCKED.
 
-**Why:** A malicious upstream node passing `{"injection": "'; DROP TABLE …"}` for a str-declared field bypasses every string-only check. Raising at the type-confusion boundary closes the bypass; coercion-to-string converts a structural attack into an unaudited storage event.
+**Why:** A malicious upstream node passing `{"injection": "'; DROP TABLE …"}` for a str-declared field bypasses every string-only check; raising at the type-confusion boundary closes the bypass. See guide for exhaustive examples.
 
 ### 3. Safe Types Are Returned As-Is
 
@@ -539,7 +536,7 @@ Values of declared-safe types (`int`, `float`, `bool`, `Decimal`, `datetime`, `d
 
 When a security-relevant kwarg (classification policy, tenant scope, clearance context, audit correlation ID) is plumbed through a helper, EVERY call site of that helper MUST be updated in the SAME PR. Updating the "primary" call site and deferring siblings is BLOCKED.
 
-**Why:** A helper takes a security-relevant kwarg precisely because the unqualified call leaks or misbehaves. Leaving any sibling on the unqualified signature ships the exact failure mode the kwarg was introduced to fix; the "safe default" is by definition the insecure default. Fix is mechanical: `grep -rn 'helper_name(' .` + patch every hit.
+**Why:** A helper takes a security-relevant kwarg precisely because the unqualified call leaks or misbehaves, so any sibling left on the unqualified signature ships the exact failure mode the kwarg fixes (the "safe default" is the insecure default). Fix is mechanical: `grep -rn 'helper_name(' .` + patch every hit.
 
 ## Kailash-Specific Security
 

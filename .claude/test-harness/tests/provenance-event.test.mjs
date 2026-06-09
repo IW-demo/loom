@@ -30,7 +30,7 @@ const {
   chainProvenanceEvent,
 } = pe;
 
-const OP = { verified_id: "548FABCD", person_id: "pid-example-10e7dd16" };
+const OP = { verified_id: "548FABCD", person_id: "pid-maintainer-10e7dd16" };
 const TS = "2026-06-01T00:00:00Z";
 
 function baseArgs(overrides = {}) {
@@ -72,8 +72,8 @@ test("operator_ref carries identity ONLY — a model key is rejected (#411)", ()
     /not an allowed field/,
   );
   // display_id IS allowed (optional)
-  const ok = buildProvenanceEvent(baseArgs({ operatorRef: { ...OP, display_id: "example" } }));
-  assert.equal(ok.operator_ref.display_id, "example");
+  const ok = buildProvenanceEvent(baseArgs({ operatorRef: { ...OP, display_id: "maintainer" } }));
+  assert.equal(ok.operator_ref.display_id, "maintainer");
 });
 
 test("operator_ref missing verified_id / person_id is rejected", () => {

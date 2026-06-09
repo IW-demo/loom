@@ -23,7 +23,7 @@ Before writing ANY file, you MUST read the target's existing content to understa
 
 ### 1. Resolve BUILD repo
 
-Read `sync-manifest.yaml` → `repos.{target}.build` to get the BUILD repo name.
+Read `sync-manifest.yaml` → `repos.{target}.build` to get the BUILD repo logical NAME. Resolve its on-disk path via `bin/lib/loom-links.mjs::resolveRepo("build.{target}")` — the canonical NAME→location binding (`cross-repo.md` MUST-1), never a positional `../{build}` / `~/repos/{build}` guess.
 
 **Early-exit on `build: null` (MUST).** When `repos.<target>.build` is `null`, `/sync-to-build` MUST exit immediately, before any inventory or merge planning, with the following message:
 
@@ -37,13 +37,13 @@ The `base` variant (v2.21.0+, language-agnostic non-Kailash) is the canonical ca
 
 **BLOCKED rationalizations:** "I'll synthesize a fake BUILD path so the rest of the command works" / "Treat `null` as the empty string and continue" / "Resolve to a sibling repo and push there as a no-op" / "/sync-to-build base is harmless if there's nothing to push — let it run". A `null` build is a structural signal that `/sync-to-build` is the wrong command for this variant; running it anyway either silently no-ops (hiding the operator's mistake) or writes to a wrong target (data corruption).
 
-Otherwise resolve to absolute path and proceed to step 2.
+Otherwise resolve the absolute path via `resolveRepo("build.{target}")` (an undeclared linkage is a typed `LinkError`, surfaced — not a positional fallback) and proceed to step 2.
 
 ### 2. Inventory the BUILD repo (READ FIRST)
 
 Before computing what to push, read what the BUILD repo already has:
 
-1. List ALL directories under BUILD `.claude/skills/` — note any that use different numbering than loom/ source
+1. List ALL directories under BUILD `.gemini/skills/` — note any that use different numbering than loom/ source
 2. List ALL agents, commands, rules — note BUILD-specific files
 3. If skill numbering diverges from source, **STOP and report** — do not blindly push canonical-numbered skills on top of a differently-numbered tree
 
@@ -135,7 +135,16 @@ If `.claude/VERSION` exists, update `upstream.build_version`. If it doesn't exis
 - `sync-manifest.yaml`, `variants/` — source-only
 - `learning/` — per-repo data
 - `.proposals/`, `settings.local.json` — per-repo
+- `.claude/bin/*.local.json` — gitignored operator-local config (loom-links
+  registry; mirrors `/sync`'s `LOOM_LOCAL_PATTERNS` at
+  `.claude/bin/sync-tier-aware.mjs::LOOM_LOCAL_PATTERNS`). Parity per #352.
+  The companion `*.local.example.json` schema templates DO ship as committed
+  schemas; only the operator-local `.local.json` instances stay out.
 - `CLAUDE.md` — repo-specific (never overwritten)
+
+The `.claude/bin/*.local.json` exclusion mirrors `/sync`'s loom-local exclusion; both outbound paths should converge on a shared `isNeverSynced` predicate so the two never drift (Stage-2 follow-up under #350's umbrella scaffold).
+
+**Enforcement note:** before any write in step 6, the `coc-sync` delegate MUST read this exclusion list AND `sync-manifest.yaml::exclude:` and reject any candidate path matching either. Mechanical enforcement lives in the `coc-sync` agent's `/sync-to-build` step (and `sync-tier-aware.mjs` for the /sync path). Skipping the read is BLOCKED per `rules/zero-tolerance.md` Rule 3 (silent fallback).
 
 ## Delegate
 

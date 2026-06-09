@@ -30,4 +30,4 @@ Foundation + own coordinates appearing alongside MUST NOT flag and
 MUST NOT mask the above:
 terrene-foundation/loom, gh api orgs/terrene-foundation,
 git@github.com:terrene-foundation/loom.git,
-terrene-foundation/loom#9, /Users/example/repos/loom.
+terrene-foundation/loom#9, /Users/<user>/repos/loom.

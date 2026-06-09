@@ -191,13 +191,12 @@ async def test_completion_returns_429_on_throttle():
 
 Every skip on status ≥ 500 is a silent confession that the handler is returning 500 when it should return 429 / 502 / 503 / 504. The skip hides the very violation this skill exists to prevent.
 
-See **`.claude/skills/test-skip-discipline/SKILL.md`** for the full rule on when skips are and are not acceptable.
+See **`.codex/skills/test-skip-discipline/SKILL.md`** for the full rule on when skips are and are not acceptable.
 
 ## Relationship
 
 - `rules/observability.md` § 2 (Integration Points) + Rule 8 (Mask HTTP Auth Headers) — 5xx responses MUST log `upstream_status` + `upstream_reason` with any auth-header content pre-masked.
-- `rules/llm-auth-strategy-hygiene.md` (where present) — auth error variants and their correct status-code mapping (Missing → 500; provider rejection → 502 / 503).
-- `.claude/skills/03-nexus/nexus-essential-patterns.md` — where rate-limit (429) and body-limit middleware sit in the request pipeline.
-- `.claude/skills/03-nexus/nexus-troubleshooting.md` — operator-side debugging once the status code is correct.
+- `.codex/skills/03-nexus/nexus-essential-patterns.md` — where rate-limit (429) and body-limit middleware sit in the request pipeline.
+- `.codex/skills/03-nexus/nexus-troubleshooting.md` — operator-side debugging once the status code is correct.
 
 <!-- Trigger Keywords: HTTP status code, 500 vs 503, 502 vs 503, 429 rate limit, Bedrock throttling, LLM upstream error, NexusError mapping, upstream_status, upstream_reason, Retry-After, ThrottlingException, AuthError Missing, handler error mapping, Gateway Timeout, Bad Gateway, Service Unavailable -->

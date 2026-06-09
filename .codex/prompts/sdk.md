@@ -1,6 +1,6 @@
 ---
 name: sdk
-description: "Loom command: sdk"
+description: "Core SDK quick reference: workflows, 110+ nodes, runtime, async, cycles, MCP, OpenTelemetry."
 ---
 
 # /sdk - Core SDK Quick Reference
@@ -71,4 +71,4 @@ When working with Core SDK, deploy:
 
 ## Skill Reference
 
-This command loads: `.claude/skills/01-core-sdk/SKILL.md`
+This command loads: `.codex/skills/01-core-sdk/SKILL.md`

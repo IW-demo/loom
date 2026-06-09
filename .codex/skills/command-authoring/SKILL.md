@@ -1,10 +1,6 @@
 ---
 name: command-authoring
 description: "Authoring or auditing commands (CC/Codex/Gemini). Frontmatter, ≤150-line body, neutral phrasing, native-primitive carve-outs, variant overlays."
-tools:
-  - Read
-  - Glob
-  - Grep
 ---
 
 # Command Authoring
@@ -17,11 +13,11 @@ Authoring a new slash command. Auditing an existing command for line cap, neutra
 
 ## Quick Reference
 
-| CLI    | On-disk path                   | Format   | Slash invocation  | Frontmatter shape                                                             |
-| ------ | ------------------------------ | -------- | ----------------- | ----------------------------------------------------------------------------- |
-| CC     | `.claude/commands/<name>.md`   | Markdown | `/<name>`         | YAML: `name:` + `description:` + optional `argument-hint:` / `allowed-tools:` |
+| CLI    | On-disk path                   | Format   | Slash invocation                                                                                                                                 | Frontmatter shape                                                             |
+| ------ | ------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| CC     | `.codex/prompts/<name>.md`   | Markdown | `/<name>`                                                                                                                                        | YAML: `name:` + `description:` + optional `argument-hint:` / `allowed-tools:` |
 | Codex  | `.codex/prompts/<name>.md`     | Markdown | `bin/coc <name> "<prompt>"` (deprecated upstream: `/prompts:<name>` is no longer loaded by Codex CLI 0.128+ — `bin/coc` dispatcher is canonical) | Same YAML, preserved from source                                              |
-| Gemini | `.gemini/commands/<name>.toml` | TOML     | `/<name>`         | `name`, `description`, `prompt = '''…'''`, optional `tools = [...]`           |
+| Gemini | `.gemini/commands/<name>.toml` | TOML     | `/<name>`                                                                                                                                        | `name`, `description`, `prompt = '''…'''`, optional `tools = [...]`           |
 
 | Constraint       | Value                                                                                                                                           |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -33,7 +29,7 @@ Authoring a new slash command. Auditing an existing command for line cap, neutra
 
 ## Single Source, Three Emissions
 
-The authoritative copy lives at `.claude/commands/<name>.md`. The emitter `.claude/bin/emit-cli-artifacts.mjs` (driven by `coc-sync` Step 6.6) produces:
+The authoritative copy lives at `.codex/prompts/<name>.md`. The emitter `.claude/bin/emit-cli-artifacts.mjs` (driven by `coc-sync` Step 6.6) produces:
 
 - `.codex/prompts/<name>.md` — Markdown passthrough with Codex-native adaptations from `variants/codex/commands/<name>.md` overlays (if any).
 - `.gemini/commands/<name>.toml` — TOML wrap of the same body inside a triple-single-quote `prompt` block; YAML frontmatter is converted to TOML keys.
@@ -86,6 +82,8 @@ Per `rules/cc-artifacts.md` Rule 3: commands inject as user messages and compete
 
 If a command exceeds 150 lines, the fix is almost always extraction — move the reference block into a numbered skill the command references.
 
+The ≤150-line cap is an **output-quality** discipline, not only a budget one: per the curation/over-density principle (`rules/rule-authoring.md` MUST NOT § "Rules longer than 200 lines" + cc-architect dimension 7, grounded in journal/0193's directional ablation), a body whose load-bearing steps are drowned in non-load-bearing prose degrades the OUTPUT of the agent that loads it. Surfacing over-density at audit time is an advisory FINDING (recommend extraction), never a structural FAIL.
+
 ## Neutral Phrasing — Cross-CLI Hygiene
 
 Commands ship to all three CLIs. Body content MUST NOT bake in CC-native syntax that breaks on Codex / Gemini. Per `rules/cross-cli-artifact-hygiene.md`:
@@ -133,7 +131,7 @@ Variant files supply replacement bodies only for the slots that diverge. Unoverr
 
 ## Native-Primitive Carve-Outs
 
-Some CC commands map to a CLI's own native primitive — emitting a `.codex/prompts/<name>.md` or `.gemini/commands/<name>.toml` for them would shadow the native path. Per `.claude/agents/codex-architect.md` § Codex-Native Primitives:
+Some CC commands map to a CLI's own native primitive — emitting a `.codex/prompts/<name>.md` or `.gemini/commands/<name>.toml` for them would shadow the native path. Per `.codex/agents/codex-architect.md` § Codex-Native Primitives:
 
 - **`/review`** → `codex review --uncommitted --base main` (Codex native). Do NOT emit a `.codex/prompts/review.md`.
 - **`/security-review`** → architect-decided; check the per-CLI exclusions list before adding.
@@ -185,7 +183,7 @@ Glob form is supported (`commands/i-*.md`). The emitter honors exclusions at sou
 | Always-on boundary enforcement                              | Rule       |
 | Deterministic hook firing on tool event / session lifecycle | Hook       |
 
-If a "command" file grows judgment rubrics, scoring criteria, or conditional branching with recovery paths, it's an agent in disguise. Move the body into `.claude/agents/<name>.md` and shrink the command to a 20-line dispatch (`Delegate to <name>-specialist with the user's input as the prompt.`).
+If a "command" file grows judgment rubrics, scoring criteria, or conditional branching with recovery paths, it's an agent in disguise. Move the body into `.codex/agents/<name>.md` and shrink the command to a 20-line dispatch (`Delegate to <name>-specialist with the user's input as the prompt.`).
 
 ## Common Mistakes
 
@@ -199,11 +197,11 @@ Most frequent. Reference tables, exhaustive option lists, multi-page review rubr
 
 ### 3. Missing Sync-Manifest Entry
 
-New command in `.claude/commands/` but not in `sync-manifest.yaml` ships to nobody — emitter scans tier-listed files only. Fix: add `commands/<name>.md` to the correct tier; verify with a dry-run emission against one USE target.
+New command in `.codex/prompts/` but not in `sync-manifest.yaml` ships to nobody — emitter scans tier-listed files only. Fix: add `commands/<name>.md` to the correct tier; verify with a dry-run emission against one USE target.
 
 ### 4. Native-Primitive Shadow
 
-Authoring `.claude/commands/review.md` without an exclusion entry causes the emitter to overwrite Codex's native `codex review` invocation with a redirected prompt. Fix: add `commands/review.md` to `cli_emit_exclusions.codex` BEFORE the command lands.
+Authoring a `review` command file (shadowing Codex's native `codex review`) without an exclusion entry causes the emitter to overwrite the native invocation with a redirected prompt. Fix: add that command to `cli_emit_exclusions.codex` BEFORE it lands.
 
 ### 5. Description As Sentence Paragraph
 

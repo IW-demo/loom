@@ -1,5 +1,5 @@
 name = "design"
-description = "Loom command: design"
+description = "UI/UX design principles quick reference: layout, hierarchy, accessibility, design systems."
 prompt = '''
 # /design - UI/UX Design Principles Quick Reference
 
@@ -106,6 +106,6 @@ Deploy these agents when doing design work:
 
 ## Skill Reference
 
-This command loads: `.claude/skills/23-uiux-design-principles/SKILL.md`
+This command loads: `.gemini/skills/23-uiux-design-principles/SKILL.md`
 '''
 tools = ["read_file", "glob", "grep_search", "list_directory", "run_shell_command", "write_file"]

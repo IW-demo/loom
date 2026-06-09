@@ -10,7 +10,7 @@ Codex lacks a native `codex_agent(...)` primitive. OpenAI deprecated custom prom
 
 ```
 # DO — explicit path + verification instruction inlined in the delegation task
-worktree=/Users/me/repos/myproject/.codex/worktrees/agent-feature-abc123
+worktree=/Users/<user>/repos/myproject/.codex/worktrees/agent-feature-abc123
 
 Delegate to a worker subagent (isolation=worktree, branch=feat/<name>).
 Operating spec: "$(cat .codex/prompts/specialist-ml.md)"
@@ -53,7 +53,7 @@ Operating spec: "$(cat .codex/prompts/specialist-ml.md)"
 Task: Edit packages/kailash-ml/src/trainable.rs at line 370...
 
 # DO — absolute paths anchored to the PINNED worktree path (Rule 1 style)
-worktree=/Users/me/repos/myproject/.codex/worktrees/agent-feature-abc123
+worktree=/Users/<user>/repos/myproject/.codex/worktrees/agent-feature-abc123
 
 Delegate to a worker subagent (isolation=worktree).
 Operating spec: "$(cat .codex/prompts/specialist-ml.md)"
@@ -62,7 +62,7 @@ Task: Edit $worktree/packages/kailash-ml/src/trainable.rs at line 370...
 # DO NOT — absolute paths pointing to the PARENT checkout
 Delegate to a worker subagent (isolation=worktree).
 Operating spec: "$(cat .codex/prompts/specialist-ml.md)"
-Task: Edit /Users/me/repos/myproject/packages/kailash-ml/src/trainable.rs at line 370...
+Task: Edit /Users/<user>/repos/myproject/packages/kailash-ml/src/trainable.rs at line 370...
 # ↑ writes land in the MAIN checkout; the worktree stays empty; auto-cleanup
 #   deletes the empty worktree; the work is either silently on main OR lost.
 ```

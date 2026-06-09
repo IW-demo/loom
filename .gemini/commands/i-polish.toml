@@ -1,5 +1,5 @@
 name = "i-polish"
-description = "Loom command: i-polish"
+description = "Visual refinement workflow for frontend artifacts — typography, spacing, motion."
 prompt = '''
 # /i-polish - Visual Refinement Workflow
 
@@ -134,8 +134,8 @@ Deploy these agents for visual refinement:
 
 ## Skill References
 
-- `.claude/skills/23-uiux-design-principles/design-principles.md` - Design principles
-- `.claude/skills/23-uiux-design-principles/motion-design.md` - Motion design
-- `.claude/skills/23-uiux-design-principles/ux-writing.md` - UX writing
+- `.gemini/skills/23-uiux-design-principles/design-principles.md` - Design principles
+- `.gemini/skills/23-uiux-design-principles/motion-design.md` - Motion design
+- `.gemini/skills/23-uiux-design-principles/ux-writing.md` - UX writing
 '''
 tools = ["read_file", "glob", "grep_search", "list_directory", "run_shell_command", "write_file"]

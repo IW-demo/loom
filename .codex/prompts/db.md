@@ -1,6 +1,6 @@
 ---
 name: db
-description: "Loom command: db"
+description: "DataFlow quick reference: DB, CRUD, bulk, migrations, multi-tenancy, fabric engine."
 ---
 
 # /db - DataFlow Quick Reference
@@ -78,4 +78,4 @@ When working with DataFlow, deploy:
 
 ## Skill Reference
 
-This command loads: `.claude/skills/02-dataflow/SKILL.md`
+This command loads: `.codex/skills/02-dataflow/SKILL.md`

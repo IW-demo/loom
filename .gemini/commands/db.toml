@@ -1,5 +1,5 @@
 name = "db"
-description = "Loom command: db"
+description = "DataFlow quick reference: DB, CRUD, bulk, migrations, multi-tenancy, fabric engine."
 prompt = '''
 # /db - DataFlow Quick Reference
 
@@ -76,6 +76,6 @@ When working with DataFlow, deploy:
 
 ## Skill Reference
 
-This command loads: `.claude/skills/02-dataflow/SKILL.md`
+This command loads: `.gemini/skills/02-dataflow/SKILL.md`
 '''
 tools = ["read_file", "glob", "grep_search", "list_directory", "run_shell_command", "write_file"]

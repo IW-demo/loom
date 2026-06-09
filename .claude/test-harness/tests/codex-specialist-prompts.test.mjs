@@ -73,34 +73,40 @@ function parseFrontmatter(content) {
 // Tightened from "≥20" to per-target equality — drops below the
 // expected count (regression) AND surplus above expected count
 // (over-emit / exclusion miss) both surface loudly.
+//
+// Counts dropped 27→26 (no filter) and 22→21 (py/rs) on 2026-05-31 when F104
+// (commit bc664ad / journal/0184) marked agents/open-source-strategist.md
+// `loom_only:` — it is Terrene Foundation open-core IP, not a runtime codegen
+// specialist, so it is correctly never emitted to any consumer target. The
+// hardcoded expectations below were stale until updated here (#445 cycle).
 // ────────────────────────────────────────────────────────────────
-test("emitCodexAgentPrompts emits 27 specialists with no target filter", () => {
+test("emitCodexAgentPrompts emits 26 specialists with no target filter", () => {
   const promptsDir = emitToTmp();
   const prompts = listSpecialistPrompts(promptsDir);
   assert.equal(
     prompts.length,
-    27,
-    `Expected exactly 27 specialist prompts (no target filter), got ${prompts.length}: ${prompts.join(", ")}`,
+    26,
+    `Expected exactly 26 specialist prompts (no target filter), got ${prompts.length}: ${prompts.join(", ")}`,
   );
 });
 
-test("emitCodexAgentPrompts emits 22 specialists for --target py", () => {
+test("emitCodexAgentPrompts emits 21 specialists for --target py", () => {
   const promptsDir = emitToTmp("py");
   const prompts = listSpecialistPrompts(promptsDir);
   assert.equal(
     prompts.length,
-    22,
-    `Expected exactly 22 specialist prompts for --target py (tier-subscription filter), got ${prompts.length}: ${prompts.join(", ")}`,
+    21,
+    `Expected exactly 21 specialist prompts for --target py (tier-subscription filter), got ${prompts.length}: ${prompts.join(", ")}`,
   );
 });
 
-test("emitCodexAgentPrompts emits 22 specialists for --target rs", () => {
+test("emitCodexAgentPrompts emits 21 specialists for --target rs", () => {
   const promptsDir = emitToTmp("rs");
   const prompts = listSpecialistPrompts(promptsDir);
   assert.equal(
     prompts.length,
-    22,
-    `Expected exactly 22 specialist prompts for --target rs (tier-subscription filter), got ${prompts.length}: ${prompts.join(", ")}`,
+    21,
+    `Expected exactly 21 specialist prompts for --target rs (tier-subscription filter), got ${prompts.length}: ${prompts.join(", ")}`,
   );
 });
 

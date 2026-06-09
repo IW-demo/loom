@@ -1,6 +1,6 @@
 ---
 name: i-audit
-description: "Loom command: i-audit"
+description: "Design quality audit with AI-slop detection — enterprise SaaS UI inspection."
 ---
 
 # /i-audit - Design Quality Audit with AI Slop Detection
@@ -124,7 +124,7 @@ Deploy these agents for design audits:
 
 ## Skill References
 
-- `.claude/skills/23-uiux-design-principles/SKILL.md` - Design principles
-- `.claude/skills/23-uiux-design-principles/motion-design.md` - Motion design
-- `.claude/skills/23-uiux-design-principles/ux-writing.md` - UX writing
-- `.claude/skills/25-ai-interaction-patterns/SKILL.md` - AI interaction patterns
+- `.codex/skills/23-uiux-design-principles/SKILL.md` - Design principles
+- `.codex/skills/23-uiux-design-principles/motion-design.md` - Motion design
+- `.codex/skills/23-uiux-design-principles/ux-writing.md` - UX writing
+- `.codex/skills/25-ai-interaction-patterns/SKILL.md` - AI interaction patterns

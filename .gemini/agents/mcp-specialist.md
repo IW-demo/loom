@@ -110,7 +110,7 @@ workflow.add_node("LLMAgentNode", "agent", {
 When this guidance is insufficient, consult:
 
 - the Kailash MCP server - Production MCP implementation
-- `.claude/skills/05-kailash-mcp/` - MCP pattern skills
+- `.gemini/skills/05-kailash-mcp/` - MCP pattern skills
 
 ---
 

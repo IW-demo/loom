@@ -229,7 +229,7 @@ const CASES = [
     // `--root <dir>` points at a destination, committed `.local.json`
     // files ARE scanned because their presence at a sync destination IS
     // the disclosure event. The fixture plants a synthetic
-    // `loom-links.local.json` carrying `/Users/fakeuser/fake-repos`
+    // `loom-links.local.json` carrying `/Users/<user>/fake-repos`
     // home-path shapes — these MUST flag at the destination scan. At
     // loom-source the same predicate path is excluded; the predicate's
     // destination-mode flip is what this fixture pins.
@@ -253,8 +253,8 @@ const CASES = [
   {
     // F77 bad (#386): a synced .claude/settings.json carrying SYNTHETIC
     // operator-PII paths inside permissions.allow tool-call matchers.
-    // The fixture plants 3 Edit/Write/Read(/Users/fakeuser/...) entries
-    // + 1 Bash(/home/fakebuilder/...) entry — 4 settings-permission-
+    // The fixture plants 3 Edit/Write/Read(/Users/<user>/...) entries
+    // + 1 Bash(/home/<user>/...) entry — 4 settings-permission-
     // absolute-path findings expected (one per matcher). The /Users/
     // and /home/ tokens additionally trigger the operator-home-path
     // shape, but the fixture's count lock is on the new shape only —
@@ -269,14 +269,14 @@ const CASES = [
   },
   {
     // F77 own-coords-still-flagged (#386): proves the new SHAPE skips
-    // the Option-1 allowlist. The maintainer's own /Users/example/ path
+    // the Option-1 allowlist. The maintainer's own /Users/<user>/ path
     // is allowlisted for PROSE leaks (per the co-owner Option-1 ruling
     // 2026-05-17 #263); the tool-call matcher form is intrinsically
     // wrong regardless of which operator's path appears inside. The
-    // fixture plants 2 Edit/Read(/Users/example/...) matchers — both
+    // fixture plants 2 Edit/Read(/Users/<user>/...) matchers — both
     // MUST flag as settings-permission-absolute-path. The
     // operator-home-path SHAPE would have suppressed these via the
-    // /Users/example/ allowlist entry, but the new SHAPE's
+    // /Users/<user>/ allowlist entry, but the new SHAPE's
     // allowlist-skip carve-out fires here. A 0 finding count = the
     // allowlist-skip regressed; a 3rd finding = the skip leaked into
     // the operator-home-path SHAPE (which MUST continue honoring
@@ -285,6 +285,27 @@ const CASES = [
     dir: "f77-settings-own-coords-still-flagged",
     expectExit: 1,
     expectShapes: ["settings-permission-absolute-path"],
+  },
+  {
+    // journal/0214 (loom#411): the customer-identity-token shape is driven
+    // by a LOOM-ONLY tenant denylist (`.claude/disclosure-tenant-denylist.json`,
+    // never synced) the scanner reads RELATIVE TO THE SCANNED ROOT. This
+    // fixture proves the mechanism without committing a real customer token
+    // to the (synced) fixture surface: the fixture provides its OWN denylist
+    // with the SYNTHETIC token "Faketenant"; leaky.js names it in LOWERCASE
+    // ("faketenant") and MUST flag (locks the case-insensitive `i` flag);
+    // clean.md uses the generic "works-council / co-determination" terms and
+    // MUST NOT flag (locks the deliberate non-tokenization of generic
+    // vocabulary). expectFindingCount: 1 locks BOTH halves — a 2nd finding
+    // = clean.md's generic terms regressed into a token; a 0 count = the
+    // tenant-denylist read or the `i` flag regressed. The other fixtures
+    // (no denylist file) implicitly lock the INERT-when-absent property:
+    // customer-identity-token never appears in their expectShapes.
+    name: "customer-identity-token",
+    dir: "customer-identity-token",
+    expectExit: 1,
+    expectShapes: ["customer-identity-token"],
+    expectFindingCount: 1,
   },
 ];
 

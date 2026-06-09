@@ -178,7 +178,7 @@ echo ""
 echo "=== T8: detect-violations PostToolUse Bash — cross-repo gh ==="
 reset_state
 # cwd basename is loom; --repo points to kailash-py → drift
-PAYLOAD=$(jq -n '{hook_event_name:"PostToolUse", tool_name:"Bash", tool_input:{command:"gh issue list --repo kailash-py/main"}, cwd:"/Users/example/repos/loom"}')
+PAYLOAD=$(jq -n '{hook_event_name:"PostToolUse", tool_name:"Bash", tool_input:{command:"gh issue list --repo kailash-py/main"}, cwd:"/Users/<user>/repos/loom"}')
 OUT=$(printf '%s' "$PAYLOAD" | node "$HOOK" 2>/dev/null)
 if printf '%s' "$OUT" | jq -e '.hookSpecificOutput.validation | test("repo-scope-discipline")' >/dev/null 2>&1; then
   PASS=$((PASS + 1)); echo "  PASS  PostToolUse cross-repo gh → repo-scope flag"
@@ -199,7 +199,7 @@ echo "=== T8a: hook-output-discipline MUST-3 — \$REPO shell-variable skip ==="
 reset_state
 # Pre-expansion shell variable in --repo arg → detector MUST skip (return null)
 SHELLVAR_CMD=$(cat .claude/audit-fixtures/violation-patterns/detectRepoScopeDriftBash/skip-shell-variable.txt)
-PAYLOAD=$(jq -n --arg cmd "$SHELLVAR_CMD" '{hook_event_name:"PostToolUse", tool_name:"Bash", tool_input:{command:$cmd}, cwd:"/Users/example/repos/loom"}')
+PAYLOAD=$(jq -n --arg cmd "$SHELLVAR_CMD" '{hook_event_name:"PostToolUse", tool_name:"Bash", tool_input:{command:$cmd}, cwd:"/Users/<user>/repos/loom"}')
 OUT=$(printf '%s' "$PAYLOAD" | node "$HOOK" 2>/dev/null)
 if printf '%s' "$OUT" | jq -e '.continue == true and (.hookSpecificOutput | not)' >/dev/null 2>&1; then
   PASS=$((PASS + 1)); echo "  PASS  \$REPO literal → bare passthrough (no false-positive flag)"
@@ -216,7 +216,7 @@ echo ""
 echo "=== T8b: hook-output-discipline MUST-3 — \${REPO} braced-variable skip ==="
 reset_state
 BRACED_CMD=$(cat .claude/audit-fixtures/violation-patterns/detectRepoScopeDriftBash/skip-braced-variable.txt)
-PAYLOAD=$(jq -n --arg cmd "$BRACED_CMD" '{hook_event_name:"PostToolUse", tool_name:"Bash", tool_input:{command:$cmd}, cwd:"/Users/example/repos/loom"}')
+PAYLOAD=$(jq -n --arg cmd "$BRACED_CMD" '{hook_event_name:"PostToolUse", tool_name:"Bash", tool_input:{command:$cmd}, cwd:"/Users/<user>/repos/loom"}')
 OUT=$(printf '%s' "$PAYLOAD" | node "$HOOK" 2>/dev/null)
 if printf '%s' "$OUT" | jq -e '.continue == true and (.hookSpecificOutput | not)' >/dev/null 2>&1; then
   PASS=$((PASS + 1)); echo "  PASS  \${REPO} braced-variable → bare passthrough"
@@ -228,7 +228,7 @@ echo ""
 echo "=== T8c: hook-output-discipline MUST-3 — \$(...) command-substitution skip ==="
 reset_state
 CMDSUB_CMD=$(cat .claude/audit-fixtures/violation-patterns/detectRepoScopeDriftBash/skip-command-substitution.txt)
-PAYLOAD=$(jq -n --arg cmd "$CMDSUB_CMD" '{hook_event_name:"PostToolUse", tool_name:"Bash", tool_input:{command:$cmd}, cwd:"/Users/example/repos/loom"}')
+PAYLOAD=$(jq -n --arg cmd "$CMDSUB_CMD" '{hook_event_name:"PostToolUse", tool_name:"Bash", tool_input:{command:$cmd}, cwd:"/Users/<user>/repos/loom"}')
 OUT=$(printf '%s' "$PAYLOAD" | node "$HOOK" 2>/dev/null)
 if printf '%s' "$OUT" | jq -e '.continue == true and (.hookSpecificOutput | not)' >/dev/null 2>&1; then
   PASS=$((PASS + 1)); echo "  PASS  \$(...) command-substitution → bare passthrough"
@@ -393,8 +393,8 @@ const {resolveMainCheckout} = require('$POC/lib/state-resolver.js');
 const main = resolveMainCheckout('$POC');
 console.log('main:', main);
 " > "$TMPDIR/resolver.txt"
-if grep -q "^main: /Users/example/repos/loom" "$TMPDIR/resolver.txt"; then
-  PASS=$((PASS + 1)); echo "  PASS  resolver from POC subdir resolves to /Users/example/repos/loom"
+if grep -q "^main: /Users/<user>/repos/loom" "$TMPDIR/resolver.txt"; then
+  PASS=$((PASS + 1)); echo "  PASS  resolver from POC subdir resolves to /Users/<user>/repos/loom"
 else
   FAIL=$((FAIL + 1)); FAILS+=("resolver wrong: $(cat $TMPDIR/resolver.txt)")
 fi
@@ -409,8 +409,8 @@ else
 fi
 
 # Switch to PRODUCTION hook paths for Phase 2 tests
-PROD_HOOK="/Users/example/repos/loom/.claude/hooks/detect-violations.js"
-PROD_GATE="/Users/example/repos/loom/.claude/hooks/posture-gate.js"
+PROD_HOOK="/Users/<user>/repos/loom/.claude/hooks/detect-violations.js"
+PROD_GATE="/Users/<user>/repos/loom/.claude/hooks/posture-gate.js"
 
 echo ""
 echo "=== T13: PreToolUse(Read) stale-record banner injection ==="
@@ -536,8 +536,8 @@ fi
 
 echo ""
 echo "=== T20: codify.md Trust Posture Wiring requirement is documented ==="
-if grep -q "ENFORCEMENT" /Users/example/repos/loom/.claude/commands/codify.md && \
-   grep -q "Trust Posture Wiring" /Users/example/repos/loom/.claude/commands/codify.md; then
+if grep -q "ENFORCEMENT" /Users/<user>/repos/loom/.claude/commands/codify.md && \
+   grep -q "Trust Posture Wiring" /Users/<user>/repos/loom/.claude/commands/codify.md; then
   PASS=$((PASS + 1)); echo "  PASS  codify.md mandates Trust Posture Wiring with ENFORCEMENT clause"
 else
   FAIL=$((FAIL + 1)); FAILS+=("codify.md ENFORCEMENT clause missing")
@@ -545,15 +545,15 @@ fi
 
 echo ""
 echo "=== T21: cc-architect.md has wiring grep sweep ==="
-if grep -q "Trust Posture Wiring" /Users/example/repos/loom/.claude/agents/cc-architect.md && \
-   grep -q "grep" /Users/example/repos/loom/.claude/agents/cc-architect.md; then
+if grep -q "Trust Posture Wiring" /Users/<user>/repos/loom/.claude/agents/cc-architect.md && \
+   grep -q "grep" /Users/<user>/repos/loom/.claude/agents/cc-architect.md; then
   PASS=$((PASS + 1)); echo "  PASS  cc-architect.md includes mechanical sweep for wiring"
 else
   FAIL=$((FAIL + 1)); FAILS+=("cc-architect wiring sweep missing")
 fi
 
 # Phase 3: state-file three-layer mutation detection (issue #25 adoption)
-PROD_VBC=/Users/example/repos/loom/.claude/hooks/validate-bash-command.js
+PROD_VBC=/Users/<user>/repos/loom/.claude/hooks/validate-bash-command.js
 mkdir -p /tmp/sftest
 
 echo ""

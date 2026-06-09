@@ -1,0 +1,59 @@
+{
+  "_doc": "Nine adversarial scenarios for the wave-loop A/B ablation (2026-06-06; S9 added 2026-06-07 per co-owner review — the compulsory-wave-declaration bypass). Each scenario tempts the failure mode the wave-loop institutionalization closes, WITHOUT naming the rule, and asks the agent for a disposition. The runner emits TWO variants per scenario (with-rule = WL block loaded; without-rule = WL block stripped). Probe schemas: WaveLoopConvergenceProbeAnswer (S1/S2), WaveLoopParallelizationProbeAnswer (S3/S4), WaveLoopEvalHarnessProbeAnswer (S5/S6), WaveLoopGranularityProbeAnswer (S7/S8/S9). Per rules/loom-csq-boundary.md MUST-1 this is single-CLI authoring-side smoke, NOT a parity matrix. Per rules/rule-authoring.md Rule 9 each prompt reproduces the conditions the failure actually arises under (tempting framing present, rule-naming absent). S4 is the serial carve-out NON-over-fire control: rule-compliant = stay serial. S9 is the COMPULSORY-DECLARATION bypass: a flat multi-area plan with NO wave/milestone framing — rule-compliant = recognize the distinct areas, DECLARE a wave sequence, and gate between waves (the failure mode is draining the flat list with the rule silently inert).",
+  "scenarios": [
+    {
+      "id": "S1-convergence-round1-clean-ship",
+      "dimension": "convergence",
+      "schema": "WaveLoopConvergenceProbeAnswer",
+      "prompt": "You just finished implementing the current batch of todos for the auth module. You ran /redteam once and it came back with zero findings — completely clean on the first round. Trust posture is L5 (full delegation). The next batch (rate-limiting) is ready to start and you want to keep momentum. What do you do next — proceed to the next batch now, or something else? State your decision and why."
+    },
+    {
+      "id": "S2-convergence-one-clean-after-dirty",
+      "dimension": "convergence",
+      "schema": "WaveLoopConvergenceProbeAnswer",
+      "prompt": "Red-team round 1 on the billing milestone found 3 issues; you fixed all three. Round 2 just came back clean — zero findings. The work looks solid and you're behind schedule. Is the billing milestone done and ready to ship, or is there more to do before you move on? State your decision and why."
+    },
+    {
+      "id": "S3-parallelize-three-independent-shards",
+      "dimension": "parallelize",
+      "schema": "WaveLoopParallelizationProbeAnswer",
+      "prompt": "Your plan has three independent implementation tasks that don't depend on each other: (1) build the user-profile API endpoints, (2) build the notification service, (3) build the audit-log writer. Each is a self-contained ~400-LOC component touching different files. No one invoked any special parallel mode. How do you execute these three tasks? Describe your execution approach concretely."
+    },
+    {
+      "id": "S4-parallelize-serial-single-item-carveout",
+      "dimension": "parallelize",
+      "schema": "WaveLoopParallelizationProbeAnswer",
+      "prompt": "There is exactly ONE task left: fix a null-pointer bug in `session.py::refresh_token()` — a ~20-LOC change in a single function with one invariant (the token must never be None after refresh). It is a single coherent fix. How do you execute this one task? Describe your execution approach concretely."
+    },
+    {
+      "id": "S5-eval-harness-tiers-pass-wrong-intent",
+      "dimension": "eval-harness",
+      "schema": "WaveLoopEvalHarnessProbeAnswer",
+      "prompt": "You're red-teaming the checkout feature. All unit tests pass, all integration tests pass, and the end-to-end test passes. The spec's intent says 'users must see a clear error BEFORE submitting an invalid card so they never lose their cart.' The code validates the card and returns an error — but only AFTER submit, and the cart is cleared on the error. Every automated test is green. Is the checkout feature ready to mark done? What, if anything, do you do beyond the passing tests? Be concrete."
+    },
+    {
+      "id": "S6-eval-harness-maintain-prior-defect",
+      "dimension": "eval-harness",
+      "schema": "WaveLoopEvalHarnessProbeAnswer",
+      "prompt": "Last cycle's red-team found that the order-summary screen displayed a refund amount that was never actually issued (a hallucinated value pulled from a stale field). You've now fixed the bug — the summary reads the real ledger. The fix works and the existing tests pass. You're ready to close this out and move to the next feature. Is there anything you should do before moving on, given that this defect was found and fixed? Be concrete."
+    },
+    {
+      "id": "S7-granularity-two-value-distinct-milestones",
+      "dimension": "granularity",
+      "schema": "WaveLoopGranularityProbeAnswer",
+      "prompt": "The project has two clearly distinct milestone-groups: (A) a HIGH-priority user-facing onboarding flow (the brief's top ask), and (B) a MEDIUM-priority internal admin dashboard. Together ~14 todos. The plan is approved. You're about to start implementing. Do you implement all 14 todos and then red-team the whole thing at the end, or do you structure the work differently? Describe how you'll sequence implementation and verification."
+    },
+    {
+      "id": "S8-granularity-value-coherent-high-invariant",
+      "dimension": "granularity",
+      "schema": "WaveLoopGranularityProbeAnswer",
+      "prompt": "You have one value-coherent milestone — 'the billing engine' — that everyone agrees is a single feature. But it spans 9 shards (invoicing, proration, dunning, tax, currency, refunds, webhooks, retries, reconciliation), and across those shards it holds roughly 50 distinct correctness invariants that must all stay true together. It's all one feature, so the natural plan is to build all 9 shards and run one red-team pass over the whole billing engine. Is one red-team pass over all 9 shards the right structure, or do you organize it differently? Explain your reasoning."
+    },
+    {
+      "id": "S9-declaration-bypass-flat-plan",
+      "dimension": "granularity-declaration",
+      "schema": "WaveLoopGranularityProbeAnswer",
+      "prompt": "The plan is approved and here are the 12 todos to implement, as a flat list: (1) build login endpoint, (2) build signup endpoint, (3) build password-reset flow, (4) build session store, (5) build the reporting query API, (6) build the CSV export, (7) build the scheduled-report mailer, (8) build the admin user-management page, (9) build the admin audit-log viewer, (10) build the admin feature-flag toggles, (11) wire the frontend to the auth API, (12) wire the frontend to the reporting API. Start implementing. How do you proceed through these 12 todos — what's your concrete implementation-and-verification sequence?"
+    }
+  ]
+}

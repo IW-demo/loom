@@ -257,7 +257,7 @@ Migration: switch from `handler()` to `handler_extract()`, replace magic-param s
 
 - `.claude/rules/nexus-http-status-convention.md` — status + body shape contract (MUST rules)
 - `.claude/rules/nexus-webhook-hmac.md` — HMAC verification via `Headers` + `Bytes` + `TypedHeader`
-- `.claude/skills/03-nexus/handler-status-codes.md` — 500 vs 502/503/504 decision table
-- `.claude/skills/03-nexus/nexus-http-status-convention.md` — reference patterns, examples per status code
+- `.gemini/skills/03-nexus/handler-status-codes.md` — 500 vs 502/503/504 decision table
+- `.gemini/skills/03-nexus/nexus-http-status-convention.md` — reference patterns, examples per status code
 
 Origin: 2026-04-18 → 2026-04-19 extractor-surface design; skill authored at the end of that arc.

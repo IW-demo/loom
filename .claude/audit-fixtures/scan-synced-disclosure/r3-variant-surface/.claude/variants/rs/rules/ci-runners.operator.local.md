@@ -13,7 +13,7 @@ it MUST produce ZERO findings because the `*.operator.local.md` suffix
 rule excludes it from the walk entirely:
 
 Self-hosted runner: Fakehost-MacStudio (synthetic operator hostname).
-Operator checkout: /Users/fakeoperator/repos/kailash-rs (synthetic).
+Operator checkout: /Users/<user>/repos/kailash-rs (synthetic).
 Service label: com.fakeco.actions.runner.alpha (synthetic).
 
 If this file's tokens ever appear as findings, the suffix-exclusion

@@ -47,8 +47,8 @@ const pe = require("../../hooks/lib/provenance-event.js");
 
 const ID = {
   verified_id: "DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF",
-  person_id: "pid-example-10e7dd16",
-  display_id: "example",
+  person_id: "pid-maintainer-10e7dd16",
+  display_id: "maintainer",
 };
 const TS = "2026-06-01T12:00:00Z";
 
@@ -74,7 +74,7 @@ test("classify: Task → Delegation, prompt hashed, subagent_type kept", () => {
 
 test("classify: mutation write to journal DECISION → Decision", () => {
   const r = classify("Write", {
-    file_path: "/repo/journal/0192-example-DECISION-foo.md",
+    file_path: "/repo/journal/0192-maintainer-DECISION-foo.md",
   });
   assert.equal(r.kind, "Decision");
   assert.ok(r.payload.journal_path.endsWith("DECISION-foo.md"));
@@ -114,6 +114,77 @@ test("classify: read-path tools → skip (null)", () => {
   for (const t of ["Read", "Grep", "Glob", "WebFetch", "WebSearch"]) {
     assert.equal(classify(t, { file_path: "/repo/x" }), null, `${t} must skip`);
   }
+});
+
+// ── 1b. cross-CLI classify (F101 item 1, loom#411) ──────────────────────────
+// ONE hook file is registered on all three CLIs; classify() recognizes each
+// CLI's DISJOINT tool vocab and maps by EFFECT (not by CLI).
+
+test("classify[gemini]: write_file → Action with file_path", () => {
+  const r = classify("write_file", { file_path: "/repo/src/app.py" });
+  assert.equal(r.kind, "Action");
+  assert.equal(r.payload.file_path, "/repo/src/app.py");
+  assert.equal(r.payload.tool, "write_file");
+});
+
+test("classify[gemini]: replace → Action (edit tool)", () => {
+  const r = classify("replace", { file_path: "/repo/src/app.py" });
+  assert.equal(r.kind, "Action");
+});
+
+test("classify[gemini]: write_file to journal DECISION → Decision", () => {
+  const r = classify("write_file", {
+    file_path: "/repo/journal/0216-maintainer-DECISION-foo.md",
+  });
+  assert.equal(r.kind, "Decision");
+  assert.ok(r.payload.journal_path.endsWith("DECISION-foo.md"));
+});
+
+test("classify[gemini]: run_shell_command → Action, command hashed", () => {
+  const r = classify("run_shell_command", {
+    command: "export TOKEN=sk-GEMLEAK && echo hi",
+  });
+  assert.equal(r.kind, "Action");
+  assert.match(r.payload.command_sha256, /^[0-9a-f]{64}$/);
+  assert.ok(!JSON.stringify(r.payload).includes("sk-GEMLEAK"));
+});
+
+test("classify[codex]: apply_patch → Action", () => {
+  const r = classify("apply_patch", { file_path: "/repo/src/lib.rs" });
+  assert.equal(r.kind, "Action");
+  assert.equal(r.payload.file_path, "/repo/src/lib.rs");
+});
+
+test("classify[codex]: shell (string command) → Action, command hashed", () => {
+  const r = classify("shell", { command: "cat secret.env" });
+  assert.equal(r.kind, "Action");
+  assert.match(r.payload.command_sha256, /^[0-9a-f]{64}$/);
+  assert.equal(r.payload.command_chars, "cat secret.env".length);
+});
+
+test("classify[codex]: shell (ARRAY command) → Action, joined+hashed (secrets fence)", () => {
+  const r = classify("unified_exec", {
+    command: ["bash", "-lc", "export TOKEN=sk-CODEXLEAK && echo hi"],
+  });
+  assert.equal(r.kind, "Action");
+  assert.match(r.payload.command_sha256, /^[0-9a-f]{64}$/);
+  // array form is joined for the length + hash; raw secret never stored
+  assert.equal(
+    r.payload.command_chars,
+    "bash -lc export TOKEN=sk-CODEXLEAK && echo hi".length,
+  );
+  assert.ok(!JSON.stringify(r.payload).includes("sk-CODEXLEAK"));
+});
+
+test("classify[cross-cli]: read-path tool names on other CLIs → skip (null)", () => {
+  for (const t of ["read_file", "grep_search", "list_directory", "glob"]) {
+    assert.equal(classify(t, { file_path: "/repo/x" }), null, `${t} skip`);
+  }
+});
+
+test("classify[cross-cli]: only CC Task is a delegation tool-call", () => {
+  // Gemini @agent / Codex inline-cat are NOT tool calls — no delegation kind here.
+  assert.equal(classify("Task", { subagent_type: "reviewer" }).kind, "Delegation");
 });
 
 // ── 2. operator_ref projection + attribution ────────────────────────────────
@@ -393,7 +464,7 @@ test("MEDIUM-1: absolute file_path under repo → repo-relative (disclosure fenc
 
 test("_relativizePath: outside-repo absolute → basename only", () => {
   assert.equal(
-    _relativizePath("/repo", "/Users/jane/clients/acme/secret-layout.py"),
+    _relativizePath("/repo", "/Users/<user>/clients/acme/secret-layout.py"),
     "secret-layout.py",
   );
   assert.equal(

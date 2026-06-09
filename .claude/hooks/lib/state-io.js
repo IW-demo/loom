@@ -636,8 +636,8 @@ function writePosture(cwd, posture) {
  */
 function _stripRepoPath(p) {
   if (typeof p !== "string" || !p) return "unknown";
-  // Trailing-slash basename: works for `/Users/x/repos/loom`,
-  // `/home/x/repos/loom`, `/repos/loom`, `C:\\Users\\x\\repos\\loom`,
+  // Trailing-slash basename: works for `/Users/<user>/repos/loom`,
+  // `/home/<user>/repos/loom`, `/repos/loom`, `C:\\Users\\x\\repos\\loom`,
   // and relative paths alike.
   const idx = Math.max(p.lastIndexOf("/"), p.lastIndexOf("\\"));
   return idx >= 0 ? p.slice(idx + 1) || "unknown" : p;

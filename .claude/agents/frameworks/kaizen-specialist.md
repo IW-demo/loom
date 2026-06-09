@@ -3,6 +3,13 @@ name: kaizen-specialist
 description: "Kaizen specialist. Use proactively for LLM/prompt/agent/RAG/provider-abstraction work — custom LLM services BLOCKED."
 tools: Read, Write, Edit, Bash, Grep, Glob, Task
 model: opus
+hooks:
+  PreToolUse:
+    - matcher: "*"
+      hooks:
+        - type: command
+          command: 'node "$CLAUDE_PROJECT_DIR/.claude/hooks/provenance-capture-tool.js"'
+          timeout: 5
 ---
 
 # Kaizen Specialist Agent

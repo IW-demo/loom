@@ -1,10 +1,6 @@
 ---
 name: skill-authoring
 description: "Authoring or auditing skills (CC/Codex/Gemini). Frontmatter, description ≤200 chars, progressive disclosure, variant overlays."
-tools:
-  - Read
-  - Glob
-  - Grep
 ---
 
 # Skill Authoring
@@ -29,7 +25,7 @@ Authoring a new skill. Auditing an existing skill for description-length, progre
 ## Directory Layout
 
 ```
-.claude/skills/<skill-name>/
+.codex/skills/<skill-name>/
 ├── SKILL.md                  ← primary entry, frontmatter-bearing
 ├── <topic-1>.md              ← progressive-disclosure depth
 ├── <topic-2>.md
@@ -75,7 +71,7 @@ The emitter at `/sync` distribute time renames `allowed-tools:` to `tools:` for 
 
 ### Tool Names Are Identifiers, Not Verbs
 
-Tool entries are identifiers the runtime maps to its native primitives. CLI translation tables live at `variants/<cli>/tool-translation.yaml`. Skill frontmatter is the contract: list every tool the SKILL.md body or its sub-files actually invoke.
+Tool entries are identifiers the emitter maps to each CLI's native primitives at `/sync` distribute time: the **Gemini** lane translates them (`Read`→`read_file`, `Grep`→`grep_search`, `Glob`→`glob`, …) and the **Codex** lane strips the `tools:` block entirely (Codex prompts/skills carry no per-artifact tool restriction, mirroring how agent prompts emit). The translation table is `CC_TO_GEMINI_TOOLS` in `.claude/bin/emit-cli-artifacts.mjs` (the same table the agents lane uses); skills are translated by `translateSkillFrontmatterTools` there. Skill frontmatter is the contract: list every tool the SKILL.md body or its sub-files actually invoke.
 
 ```yaml
 # DO — minimal, accurate list
@@ -111,7 +107,9 @@ sub-topic-2.md   ← Specialist deep-dive (e.g., fixture patterns, error taxonom
 fixtures/        ← Optional: example payloads the skill references
 ```
 
-The SKILL.md body should be enough that a session resolves common questions without expanding sub-files into context. Sub-files load on demand via explicit cross-reference (`See [topic.md](topic.md) for the full taxonomy`).
+The SKILL.md body should be enough that a session resolves common questions without expanding sub-files into context. Sub-files load on demand via explicit cross-reference (`See [<topic>.md](<topic>.md) for the full taxonomy`).
+
+Progressive disclosure is also an **output-quality** discipline, not only a token-budget one: per the curation/over-density principle (`rules/rule-authoring.md` MUST NOT § "Rules longer than 200 lines" + cc-architect dimension 7, grounded in journal/0193's directional ablation), an artifact whose load-bearing content is drowned in non-load-bearing prose degrades the OUTPUT of the agent that loads it — extract depth to sub-files, keep the body curated. Surfacing this at audit time is an advisory FINDING (recommend extraction), never a structural FAIL.
 
 ### DO — Index With Cross-References
 
@@ -152,7 +150,7 @@ The rule body is referenced from SKILL.md so its content reaches the model only 
 
 ## Cross-CLI Variant Overlays
 
-A skill authored at `.claude/skills/<name>/SKILL.md` is the canonical source. CLI-specific deltas live at `variants/<cli>/skills/<name>/SKILL.md` (or sub-files) and overlay only the diverging slot. See `rules/cross-cli-parity.md` and `guides/co-setup/05-variant-architecture.md` for the full overlay semantics.
+A skill authored at `.codex/skills/<name>/SKILL.md` is the canonical source. CLI-specific deltas live at `variants/<cli>/skills/<name>/SKILL.md` (or sub-files) and overlay only the diverging slot. See `rules/cross-cli-parity.md` and `guides/co-setup/05-variant-architecture.md` for the full overlay semantics.
 
 ### Slot-Marker Pattern
 
@@ -217,11 +215,16 @@ When auditing an existing skill:
 - [ ] No hook event names in PascalCase (`SessionStart`, `PreToolUse`) as prescriptive identifiers
 - [ ] If skill-embedded rules exist, they're inlined and the rule file carries `scope: skill-embedded`
 
+## Sub-Files
+
+- **[proximity-band-named-rationale-template.md](proximity-band-named-rationale-template.md)** — 5-sub-field template (i)–(v) for `rules/rule-authoring.md` MUST Rule 10 path (b) named-rationale budget exception, plus sub-field (vi) for Rule 11 path (b') 2nd-extraction-escalation named-rationale. Per F23a/F23b paired-extraction + R1 redteam (journals 0146/0147/0148/0149).
+
 ## Related
 
 - `rules/cc-artifacts.md` §1b — description ≤200 chars enforcement + 2026-05-06 evidence
 - `rules/cc-artifacts.md` §2 — progressive disclosure 80/20
 - `rules/rule-authoring.md` §7 — `priority:` + `scope:` for `skill-embedded` rules
+- `rules/rule-authoring.md` §10 + §11 — proximity-band admission gate (Rule 10) + 2nd-extraction escalation (Rule 11); both rules cite this skill's `proximity-band-named-rationale-template.md` sub-file for the path (b) / (b') named-rationale sub-field templates
 - `rules/cross-cli-artifact-hygiene.md` — neutral phrasing in skill bodies
 - `rules/cross-cli-parity.md` — variant overlay semantics for cross-CLI emission
 - `guides/co-setup/05-variant-architecture.md` — single-source + overlay architecture

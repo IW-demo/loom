@@ -20,6 +20,6 @@ Extracted reference material for cc-artifacts compliance.
 
 When this guidance is insufficient, consult:
 
-- `.claude/skills/04-kaizen/` - Complete Kaizen skills directory
-- `.claude/skills/04-kaizen/kaizen-advanced-patterns.md` - Advanced patterns
+- `.gemini/skills/04-kaizen/` - Complete Kaizen skills directory
+- `.gemini/skills/04-kaizen/kaizen-advanced-patterns.md` - Advanced patterns
 - the kaizen package (`examples/`) - Working examples

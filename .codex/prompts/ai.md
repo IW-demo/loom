@@ -1,6 +1,6 @@
 ---
 name: ai
-description: "Loom command: ai"
+description: "Kaizen quick reference: BaseAgent, Signature, Delegate, multi-agent, RAG, trust, governance."
 ---
 
 # /ai - Kaizen Quick Reference
@@ -81,4 +81,4 @@ When working with Kaizen, deploy:
 
 ## Skill Reference
 
-This command loads: `.claude/skills/04-kaizen/SKILL.md`
+This command loads: `.codex/skills/04-kaizen/SKILL.md`

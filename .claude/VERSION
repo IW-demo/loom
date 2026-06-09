@@ -2,7 +2,7 @@
   "version": "2.39.0",
   "type": "coc-source",
   "description": "COC artifact source of truth (codegen) — public framework release",
-  "released": "2026-06-03",
+  "released": "2026-06-09",
   "upstream": {
     "name": "co",
     "repo": "terrene-foundation/co",
@@ -12,12 +12,12 @@
   "changelog": [
     {
       "version": "2.39.0",
-      "date": "2026-06-03",
-      "summary": "Initial public release of the COC (Code Orchestration) artifact framework: rules, skills, agents, commands, hooks, and multi-CLI (Claude Code / Codex / Gemini) emission tooling. Internal development history is maintained in the private upstream and is not part of this public release.",
+      "date": "2026-06-09",
+      "summary": "Public framework sync. Internal development history is maintained separately and is not part of this repository.",
       "changes": [
-        "Initial public release."
+        "Framework sync."
       ]
     }
   ],
-  "updated": "2026-06-03"
+  "updated": "2026-06-09"
 }

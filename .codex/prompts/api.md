@@ -1,6 +1,6 @@
 ---
 name: api
-description: "Loom command: api"
+description: "Nexus quick reference: API+CLI+MCP platform; workflow deploy, sessions, K8s, OpenAPI, CSRF."
 ---
 
 # /api - Nexus Quick Reference
@@ -75,4 +75,4 @@ When working with Nexus, deploy:
 
 ## Skill Reference
 
-This command loads: `.claude/skills/03-nexus/SKILL.md`
+This command loads: `.codex/skills/03-nexus/SKILL.md`

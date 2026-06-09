@@ -70,18 +70,24 @@ kz-engage/
 .claude/learning/provenance/
 # F40-4 PII survey evidence file — aggregate counts only, but contains
 # survey methodology that could re-enable re-correlation if leaked.
-SURVEY-F40-4-2026-05-26.evidence.md
 # F40 Stage 1b (redteam-found): sibling test-harness telemetry — same
 # disclosure class as .claude/learning/observations.jsonl above; not
-# covered by that line because the path prefix differs.
-.claude/test-harness/.claude/learning/
+# covered by that line because the path prefix differs. Broadened to the
+# whole scratch tree (#408 AC#4 redteam): emit-driven tests exec the
+# emitter/hooks with cwd=REPO, materializing .claude/test-harness/.claude/
+# {learning/, operator-id} — none of which is ever committed.
+.claude/test-harness/.claude/
 # observations.archive/ is auto-created by .claude/hooks/lib/learning-utils.js
 # at ensureLearningDir() time; gitignore explicitly so future writes to
 # the archive directory don't slip into staging.
 .claude/learning/observations.archive/
-# (Maintainer internal session-file ignore patterns are omitted from the
-# public release — they collide with framework filenames on case-insensitive
-# filesystems and reference internal working files that are not published.)
+# Root-of-repo session synthesis files — institutional decision rationale
+# may include verbatim downstream-consumer paths/identifiers per upstream
+# investigation. Working-tree only; promote to gitignored workspaces/ for
+# preservation OR commit-body for durable receipt.
+# Root-of-repo destructive-op / disclosure-containment runbooks (e.g. the F40
+# Stage 3 history-rewrite procedure) — reference the PII being purged + the
+# force-push plan; same working-tree-only class as the synthesis files above.
 # Operator-local agent worktrees (each .claude/worktrees/agent-<hash>/ is a
 # full repo checkout the worktree-isolation primitive in rules/worktree-
 # isolation.md creates for parallel agent waves). Worktree contents are

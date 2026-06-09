@@ -41,6 +41,10 @@ Artifact source of truth. Variant system active.
 | kailash-coc-claude-rs | main   | clean  | 2026-03-27  |
 ```
 
+## Resolution
+
+Repo paths come from `bin/lib/loom-links.mjs` (`resolveAll` — the canonical NAME→location binding, `cross-repo.md` MUST-1), never a positional `~/repos/<name>` scan. The list IS the set of declared linkages; a repo with no declared linkage is shown as not-linked rather than positionally discovered.
+
 ## Delegate
 
 Use **repo-ops** agent for execution.

@@ -166,6 +166,184 @@ test("P2c wired + registered-but-non-capture hook → fail (does not emit kind)"
 });
 
 // ===========================================================================
+//  #440 — codex-mcp-guard mechanism (`<hook>@codex-mcp-guard`)
+//  The mechanism qualifier is a TIGHTENING: provenance-capture-tool.js is ALSO
+//  registered in .codex/hooks.json on the shell matcher, so a bare native
+//  codex|Decision would false-pass via laneHookPresent — yet shell never writes
+//  journal files, so Decision never fires there. The qualifier forces the guard
+//  path to be verified instead.
+// ===========================================================================
+function wireCodexDecisionGuard(block, f4) {
+  block.lanes = block.lanes.map((c) =>
+    c.lane === "codex" && c.kind === "Decision"
+      ? { ...c, status: "wired", f4, f5: "apply_patch → Decision" }
+      : c,
+  );
+  return block;
+}
+
+test("G1 wired @codex-mcp-guard + guard captures + emits kind → pass", () => {
+  const block = wireCodexDecisionGuard(
+    allDeferredBlock(),
+    "provenance-capture-tool.js@codex-mcp-guard",
+  );
+  const results = evaluateProvenanceParity({
+    block,
+    extraction: extraction4(),
+    laneHookPresent: neverPresent, // native registration must NOT satisfy it
+    hookEmitsKind: (hook, kind) =>
+      hook === "provenance-capture-tool.js" && kind === "Decision",
+    guardCapturesHook: (hook) => hook === "provenance-capture-tool.js",
+  });
+  const cell = results.find((r) => r.artifact === "codex:Decision");
+  assert.equal(cell.status, "pass", JSON.stringify(cell));
+  assert.match(cell.detail, /via codex-mcp-guard/);
+});
+
+test("G2 wired @codex-mcp-guard but guard does NOT capture → fail (no native fallback)", () => {
+  const block = wireCodexDecisionGuard(
+    allDeferredBlock(),
+    "provenance-capture-tool.js@codex-mcp-guard",
+  );
+  const results = evaluateProvenanceParity({
+    block,
+    extraction: extraction4(),
+    laneHookPresent: alwaysPresent, // native says present — MUST be ignored
+    hookEmitsKind: () => true,
+    guardCapturesHook: () => false, // guard not wired
+  });
+  const cell = results.find((r) => r.artifact === "codex:Decision");
+  assert.equal(cell.status, "fail", JSON.stringify(cell));
+  assert.match(cell.detail, /codex-mcp-guard does NOT capture/);
+});
+
+test("G3 wired @codex-mcp-guard on a NON-codex lane → fail (mechanism is codex-only)", () => {
+  const block = allDeferredBlock();
+  block.lanes = block.lanes.map((c) =>
+    c.lane === "gemini" && c.kind === "Decision"
+      ? { ...c, status: "wired", f4: "provenance-capture-tool.js@codex-mcp-guard", f5: "x" }
+      : c,
+  );
+  const results = evaluateProvenanceParity({
+    block,
+    extraction: extraction4(),
+    laneHookPresent: alwaysPresent,
+    hookEmitsKind: () => true,
+    guardCapturesHook: () => true,
+  });
+  const cell = results.find((r) => r.artifact === "gemini:Decision");
+  assert.equal(cell.status, "fail", JSON.stringify(cell));
+  assert.match(cell.detail, /only valid for the codex lane/);
+});
+
+test("G4 wired with an UNKNOWN @mechanism → fail", () => {
+  const block = wireCodexDecisionGuard(
+    allDeferredBlock(),
+    "provenance-capture-tool.js@some-future-thing",
+  );
+  const results = evaluateProvenanceParity({
+    block,
+    extraction: extraction4(),
+    laneHookPresent: alwaysPresent,
+    hookEmitsKind: () => true,
+    guardCapturesHook: () => true,
+  });
+  const cell = results.find((r) => r.artifact === "codex:Decision");
+  assert.equal(cell.status, "fail", JSON.stringify(cell));
+  assert.match(cell.detail, /unknown capture mechanism/);
+});
+
+test("G5 wired @codex-mcp-guard + guard captures but hook does NOT emit kind → fail", () => {
+  const block = wireCodexDecisionGuard(
+    allDeferredBlock(),
+    "provenance-capture-tool.js@codex-mcp-guard",
+  );
+  const results = evaluateProvenanceParity({
+    block,
+    extraction: extraction4(),
+    laneHookPresent: neverPresent,
+    hookEmitsKind: () => false, // hookEmitsKind gate still applies
+    guardCapturesHook: () => true,
+  });
+  const cell = results.find((r) => r.artifact === "codex:Decision");
+  assert.equal(cell.status, "fail", JSON.stringify(cell));
+  assert.match(cell.detail, /does NOT emit provenance kind/);
+});
+
+test("G6 default guardCapturesHook is fail-closed (no predicate injected → fail)", () => {
+  const block = wireCodexDecisionGuard(
+    allDeferredBlock(),
+    "provenance-capture-tool.js@codex-mcp-guard",
+  );
+  const results = evaluateProvenanceParity({
+    block,
+    extraction: extraction4(),
+    laneHookPresent: alwaysPresent,
+    hookEmitsKind: () => true,
+    // guardCapturesHook intentionally omitted → defaults to () => false
+  });
+  const cell = results.find((r) => r.artifact === "codex:Decision");
+  assert.equal(cell.status, "fail", JSON.stringify(cell));
+  assert.match(cell.detail, /codex-mcp-guard does NOT capture/);
+});
+
+// Builds a self-contained repo root with a fake guard exporting `captureTools`
+// (separate temp dir per call so the validator's createRequire cache — keyed by
+// absolute path — never serves a stale guard between the pass + fail variants).
+function mkGuardRepo(captureTools) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "provparity-guard-"));
+  const mk = (rel, body) => {
+    const p = path.join(dir, rel);
+    fs.mkdirSync(path.dirname(p), { recursive: true });
+    fs.writeFileSync(p, body);
+  };
+  mk(".claude/hooks/cap.js", 'function c(){ return { kind: "Decision" }; }\nmodule.exports={c};');
+  mk(
+    ".claude/codex-mcp-guard/server.js",
+    `module.exports = { CAPTURE_HOOKS: ["cap.js"], CAPTURE_TOOLS: ${JSON.stringify(captureTools)} };`,
+  );
+  mk(".codex/hooks.json", JSON.stringify({ hooks: {} })); // NOT registered natively
+  mk(".gemini/settings.json", JSON.stringify({ hooks: {} }));
+  mk(
+    ".claude/sync-manifest.yaml",
+    [
+      "parity_enforcement:",
+      "  provenance_parity:",
+      "    enabled: true",
+      "    cc_capture:",
+      '      - "Decision|cap.js|PreToolUse"',
+      "    lanes:",
+      '      - "codex|Decision|wired|cap.js@codex-mcp-guard|apply_patch → Decision"',
+      '      - "gemini|Decision|deferred|#411|gemini Decision deferred"',
+      "tiers:",
+      "  cc:",
+      "    - x/**",
+    ].join("\n"),
+  );
+  return dir;
+}
+
+test("G7 INTEGRATION wired-IO: real server.js CAPTURE exports drive guardCapturesHook", () => {
+  // PASS variant — guard captures cap.js on apply_patch.
+  const okDir = mkGuardRepo(["apply_patch"]);
+  const codex = checkProvenanceParity(okDir).results.find(
+    (r) => r.artifact === "codex:Decision",
+  );
+  assert.equal(codex.status, "pass", `guard-IO must pass: ${JSON.stringify(codex)}`);
+  assert.match(codex.detail, /via codex-mcp-guard/);
+  fs.rmSync(okDir, { recursive: true, force: true });
+
+  // FAIL variant — guard exports no CAPTURE_TOOLS → wired must FAIL.
+  const badDir = mkGuardRepo([]);
+  const codex2 = checkProvenanceParity(badDir).results.find(
+    (r) => r.artifact === "codex:Decision",
+  );
+  assert.equal(codex2.status, "fail", `guard-without-tools must fail: ${JSON.stringify(codex2)}`);
+  assert.match(codex2.detail, /codex-mcp-guard does NOT capture/);
+  fs.rmSync(badDir, { recursive: true, force: true });
+});
+
+// ===========================================================================
 //  P3 — wired + hook ABSENT → fail (declared-wired-but-absent = a lie)
 // ===========================================================================
 test("P3 wired but hook absent in emit target → fail", () => {
@@ -608,10 +786,36 @@ test("INTEGRATION extractHookKinds(live repo) == the 4 closed-taxonomy kinds", (
   assert.deepEqual([...ex.kinds].sort(), ["Action", "Decision", "Delegation", "HumanInput"]);
 });
 
-test("INTEGRATION checkProvenanceParity(live repo) → 0 blocking (all deferred)", () => {
+test("INTEGRATION checkProvenanceParity(live repo) → 0 blocking; item 1 + #440 wired 4 cells", () => {
   const out = checkProvenanceParity(REPO_ROOT);
   assert.equal(out.id, "provenance-parity");
   const t = tally(out.results);
   assert.equal(t.fail, 0, `live repo must have 0 provenance-parity fails, got ${JSON.stringify(fails(out.results))}`);
-  assert.equal(t.skip, 8, "live repo: 4 kinds × 2 lanes, all deferred");
+  // F101 item 1 (PR #439): 3 cells wired (codex·Action via PreToolUse shell,
+  // gemini·Action + gemini·Decision via BeforeTool). #440 (this shard): a 4th —
+  // codex·Decision via the codex-mcp-guard apply_patch capture side-effect.
+  // 4 cells stay deferred with honest reasons (journal/0216 + journal/0218).
+  assert.equal(t.pass, 4, "4 cells wired (item 1 = 3, #440 = codex·Decision)");
+  assert.equal(t.skip, 4, "4 cells remain deferred (honest, #411-tracked)");
+  const wired = (lane, kind) =>
+    out.results.find((r) => r.artifact === `${lane}:${kind}`);
+  assert.equal(wired("codex", "Action").status, "pass");
+  assert.equal(wired("gemini", "Action").status, "pass");
+  assert.equal(wired("gemini", "Decision").status, "pass");
+  // #440: codex·Decision wired via the @codex-mcp-guard mechanism.
+  assert.equal(wired("codex", "Decision").status, "pass");
+  assert.match(
+    wired("codex", "Decision").detail,
+    /via codex-mcp-guard/,
+    "codex·Decision must pass via the guard mechanism, not the native shell registration",
+  );
+  // the 4 honest-deferred cells stay SKIP
+  for (const [lane, kind] of [
+    ["codex", "HumanInput"],
+    ["codex", "Delegation"],
+    ["gemini", "HumanInput"],
+    ["gemini", "Delegation"],
+  ]) {
+    assert.equal(wired(lane, kind).status, "skip", `${lane}:${kind} deferred`);
+  }
 });

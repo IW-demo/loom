@@ -23,6 +23,10 @@
           {
             "type": "command",
             "command": "node ./.claude/hooks/validate-bash-command.js"
+          },
+          {
+            "type": "command",
+            "command": "node ./.claude/hooks/provenance-capture-tool.js"
           }
         ]
       }

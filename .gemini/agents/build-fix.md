@@ -115,11 +115,11 @@ Escalate to a different agent if:
 
 ## Skill References
 
-- **[error-troubleshooting](../../.claude/skills/31-error-troubleshooting/SKILL.md)** - Common error patterns
-- **[gold-standards](../../.claude/skills/17-gold-standards/SKILL.md)** - Pattern compliance
+- **[error-troubleshooting](../../skills/31-error-troubleshooting/SKILL.md)** - Common error patterns
+- **[gold-standards](../../skills/17-gold-standards/SKILL.md)** - Pattern compliance
 
 ## Full Documentation
 
 When this guidance is insufficient, consult:
 
-- `.claude/skills/31-error-troubleshooting/`
+- `.gemini/skills/31-error-troubleshooting/`

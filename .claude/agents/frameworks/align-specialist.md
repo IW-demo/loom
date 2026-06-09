@@ -3,6 +3,13 @@ name: align-specialist
 description: "kailash-align specialist. Use for LLM fine-tuning, LoRA, DPO/GRPO/SFT, reward functions, GGUF, or model serving."
 tools: Read, Write, Edit, Bash, Grep, Glob, Task
 model: opus
+hooks:
+  PreToolUse:
+    - matcher: "*"
+      hooks:
+        - type: command
+          command: 'node "$CLAUDE_PROJECT_DIR/.claude/hooks/provenance-capture-tool.js"'
+          timeout: 5
 ---
 
 # Align Specialist Agent

@@ -14,8 +14,8 @@ runner host <runner-host>, <runner-host-2>, org <org>, repo <repo>,
 app-a, app-b, cli-app, consumer, downstream, financial-scenario,
 example-workspace/demo, partner organization.
 
-Public-doc placeholders: example.com, /Users/runner/, /home/me/,
-/Users/me/, com.github.actions.runner.<name>. Platform word: macOS,
+Public-doc placeholders: example.com, /Users/runner/, /home/<user>/,
+/Users/<user>/, com.github.actions.runner.<name>. Platform word: macOS,
 on Mac. Public SDK enterprise-tier docs: nexus-enterprise-features,
 dataflow-enterprise-migrations, eatp-trust-plane-enterprise.
 

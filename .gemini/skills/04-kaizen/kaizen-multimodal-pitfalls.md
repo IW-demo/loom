@@ -52,4 +52,4 @@ text = result['answer']
 Always validate with real models, not just mocks.
 
 ## References
-- **Specialist**: `.claude/agents/frameworks/kaizen-specialist.md` lines 300-373
+- **Specialist**: `.gemini/agents/frameworks/kaizen-specialist.md` lines 300-373

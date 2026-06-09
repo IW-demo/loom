@@ -79,6 +79,6 @@ See `skills/01-core-sdk/production-readiness-patterns.md` for full code examples
 
 ## Full Documentation
 
-- `.claude/skills/01-core-sdk/` — Core SDK skills directory
-- `.claude/skills/08-nodes-reference/` — Node reference
-- `.claude/skills/31-error-troubleshooting/` — Error resolution
+- `.gemini/skills/01-core-sdk/` — Core SDK skills directory
+- `.gemini/skills/08-nodes-reference/` — Node reference
+- `.gemini/skills/31-error-troubleshooting/` — Error resolution

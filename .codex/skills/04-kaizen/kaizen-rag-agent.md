@@ -28,5 +28,5 @@ class RAGAgent(BaseAgent):
 ```
 
 ## References
-- **Specialist**: `.claude/agents/frameworks/kaizen-specialist.md` lines 229-247
+- **Specialist**: `.codex/agents/frameworks/kaizen-specialist.md` lines 229-247
 - **Examples**: `examples/4-advanced-rag/`

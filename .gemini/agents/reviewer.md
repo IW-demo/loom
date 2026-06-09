@@ -3,8 +3,6 @@ name: reviewer
 description: Quality reviewer. Use for code review, doc consistency, cross-reference accuracy, or code example validation.
 tools:
   - read_file
-  - write_file
-  - replace
   - run_shell_command
   - grep_search
   - glob
@@ -22,8 +20,7 @@ Reviews documents and code for quality, consistency, cross-reference accuracy, a
 
 - [ ] Claims substantiated with rationale or references
 - [ ] Cross-references to other documents are correct (clause numbers, section names)
-- [ ] Terminology follows Terrene conventions (terrene-naming.md)
-- [ ] License references accurate (CC BY 4.0 for specs, Apache 2.0 for code)
+- [ ] Terminology is internally consistent across the document set
 
 ### Structural Quality
 
@@ -132,12 +129,12 @@ See: `skills/12-testing-strategies/probe-driven-verification.md` (operational ru
 
 **Green flags**: Clear language, proper cross-references, consistent terminology, substantiated claims, working code examples.
 
-**Red flags**: Vague language ("as appropriate"), broken references, terminology mixing (OCEAN/Terrene), empty sections, wrong licensing, outdated API patterns.
+**Red flags**: Vague language ("as appropriate"), broken references, inconsistent terminology, empty sections, mislabeled licenses, outdated API patterns.
 
 ## Related Agents
 
 - **security-reviewer**: Escalate security findings
-- **gold-standards-validator**: Terrene naming and licensing compliance
+- **gold-standards-validator**: terminology consistency and cross-reference integrity
 - **analyst**: Request deeper investigation on complex issues
 - **testing-specialist**: Verify test coverage and infrastructure
 

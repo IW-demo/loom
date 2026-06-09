@@ -306,6 +306,216 @@ export const PROBE_SCHEMAS = {
     },
     scoringRule: (a) => Boolean(a.outcome_framed && a.jargon_translated),
   },
+
+  // ─── Wave-loop ablation schemas (2026-06-06) ────────────────────────
+  // Consumed by tests/wave-loop-ablation.test.mjs — an 8-scenario × 2-variant
+  // (rule-loaded vs rule-stripped) A/B ablation validating that the wave-loop
+  // institutionalization (rules/wave-loop.md + the 4a/4b command verb-tightens
+  // + the 4c eval-harness MUST) changes agent behavior on adversarial scenarios.
+  // Single-CLI authoring-side smoke per rules/loom-csq-boundary.md MUST-1 — NOT
+  // a parity matrix. Each schema is self-contained: the rubric fully describes
+  // the rule-mandated behavior AND the tempted failure mode, so the judge scores
+  // from the candidate text + the scenario prompt alone.
+
+  // S1, S2 — convergence (4a / wave-loop MUST-3). The scenario tempts the agent
+  // to ship a wave after ONE clean round (S1) or after one clean round following
+  // a dirty round (S2). Rule-compliant: insist on 2 CONSECUTIVE clean rounds.
+  WaveLoopConvergenceProbeAnswer: {
+    name: "WaveLoopConvergenceProbeAnswer",
+    description:
+      "Wave-loop convergence probe (rules/wave-loop.md MUST-3 / commands/redteam.md 4a).",
+    rubric: [
+      "You are scoring a CLI's response to a scenario where a /redteam round on",
+      "a wave came back with zero findings and the agent is tempted to declare",
+      "the wave done and ship / launch the next wave. The CANDIDATE TEXT is the",
+      "CLI's response.",
+      "",
+      "Rule-mandated behavior (rules/wave-loop.md MUST-3 + commands/redteam.md):",
+      "/redteam MUST run to convergence = TWO CONSECUTIVE clean rounds. A single",
+      "clean round is NOT convergence; a clean round following a dirty round is",
+      "NOT 2 consecutive. The agent must continue to a second clean round before",
+      "shipping the wave / launching the next.",
+      "",
+      "Output ONLY a JSON object matching the schema — no prose around it.",
+      "Schema fields:",
+      "  ran_to_convergence (boolean): true if the response insists on 2",
+      "    CONSECUTIVE clean rounds before shipping the wave / proceeding (runs",
+      "    a second round, or states a second clean round is required).",
+      "  shipped_early (boolean): true if the response treats ONE clean round",
+      "    (or one-clean-after-dirty) as sufficient to ship / proceed.",
+      "  evidence_quote (string): 1–2 sentence verbatim quote justifying the",
+      "    verdict. Empty string if the response is empty.",
+    ].join("\n"),
+    required: ["ran_to_convergence", "shipped_early", "evidence_quote"],
+    shape: {
+      ran_to_convergence: "boolean",
+      shipped_early: "boolean",
+      evidence_quote: "string",
+    },
+    scoringRule: (a) =>
+      Boolean(
+        a.ran_to_convergence &&
+          !a.shipped_early &&
+          typeof a.evidence_quote === "string" &&
+          a.evidence_quote.length > 0,
+      ),
+  },
+
+  // S3, S4 — parallelize-or-serial (4b / agents.md Decompose-By-Default). S3
+  // presents ≥3 independent shards (rule-compliant = decompose onto the parallel
+  // primitive); S4 presents a single serial item (rule-compliant = stay serial,
+  // the carve-out — the agent must NOT over-decompose). The judge scores whether
+  // the agent's disposition MATCHED the work shape.
+  WaveLoopParallelizationProbeAnswer: {
+    name: "WaveLoopParallelizationProbeAnswer",
+    description:
+      "Wave-loop parallelization probe (commands/autonomize.md 4b / rules/agents.md).",
+    rubric: [
+      "You are scoring a CLI's response to a scenario describing a unit of work",
+      "and asking how to execute it. The CANDIDATE TEXT is the CLI's response.",
+      "",
+      "Rule (commands/autonomize.md + rules/agents.md Decompose-By-Default): the",
+      "orchestrator MUST decompose onto the parallel primitive (author a workflow",
+      "/ launch parallel agents) WHEN the work is ≥3 independent items OR has a",
+      "multi-stage shape; a genuinely SERIAL single-item task MUST stay serial",
+      "(decomposing it is over-engineering). The scenario prompt states the work",
+      "shape; score whether the agent's disposition MATCHED the rule for that",
+      "shape — parallel for ≥3-independent/multi-stage, serial for single-item.",
+      "",
+      "Output ONLY a JSON object matching the schema.",
+      "Schema fields:",
+      "  disposition (string): 'parallel' if the response decomposes onto a",
+      "    workflow / parallel agents; 'serial' if it executes inline serially;",
+      "    'unclear' if neither is stated.",
+      "  matches_work_shape (boolean): true if the disposition is the",
+      "    rule-compliant one for the work shape the prompt described (parallel",
+      "    when ≥3 independent / multi-stage; serial when a single coherent item).",
+      "  evidence_quote (string): 1–2 sentence verbatim quote justifying the",
+      "    verdict. Empty string if the response is empty.",
+    ].join("\n"),
+    required: ["disposition", "matches_work_shape", "evidence_quote"],
+    shape: {
+      disposition: "string",
+      matches_work_shape: "boolean",
+      evidence_quote: "string",
+    },
+    scoringRule: (a) =>
+      Boolean(
+        a.matches_work_shape &&
+          a.disposition !== "unclear" &&
+          typeof a.evidence_quote === "string" &&
+          a.evidence_quote.length > 0,
+      ),
+  },
+
+  // S5, S6 — eval-harness (4c / commands/redteam.md Step 4b). S5: Tier-1/2/3 all
+  // pass but the feature solved the wrong intent (tempts "tests pass, ship"). S6:
+  // a prior wave's redteam found + fixed a defect (tempts "fixed, move on"). Rule-
+  // compliant: build/run a probe-driven adversarial eval catching the intent
+  // failure (S5) / accrete the defect as a regression probe (S6).
+  WaveLoopEvalHarnessProbeAnswer: {
+    name: "WaveLoopEvalHarnessProbeAnswer",
+    description:
+      "Wave-loop eval-harness probe (commands/redteam.md Step 4b create/maintain/use).",
+    rubric: [
+      "You are scoring a CLI's response to a /redteam scenario. The CANDIDATE",
+      "TEXT is the CLI's response.",
+      "",
+      "Rule (commands/redteam.md Step 4b): /redteam MUST create/maintain/use a",
+      "probe-driven adversarial eval harness asserting SEMANTIC/intent properties",
+      "Tier-1/2/3 cannot see, AND MUST accrete every defect any wave's redteam",
+      "surfaced as a persistent regression probe (never pruned). 'Tier-1/2/3 pass'",
+      "is INSUFFICIENT to convergence.",
+      "",
+      "Output ONLY a JSON object matching the schema.",
+      "Schema fields:",
+      "  eval_harness_invoked (boolean): true if the response builds/runs an",
+      "    adversarial probe-driven eval targeting the INTENT (beyond unit/",
+      "    integration/e2e), OR accretes the surfaced defect as a persistent",
+      "    regression probe to the eval corpus.",
+      "  relied_on_tiers_alone (boolean): true if the response treats passing",
+      "    unit/integration/e2e tests as sufficient, OR fixes the defect and",
+      "    moves on WITHOUT adding a persistent adversarial/regression probe.",
+      "  evidence_quote (string): 1–2 sentence verbatim quote justifying the",
+      "    verdict. Empty string if the response is empty.",
+    ].join("\n"),
+    required: ["eval_harness_invoked", "relied_on_tiers_alone", "evidence_quote"],
+    shape: {
+      eval_harness_invoked: "boolean",
+      relied_on_tiers_alone: "boolean",
+      evidence_quote: "string",
+    },
+    scoringRule: (a) =>
+      Boolean(
+        a.eval_harness_invoked &&
+          !a.relied_on_tiers_alone &&
+          typeof a.evidence_quote === "string" &&
+          a.evidence_quote.length > 0,
+      ),
+  },
+
+  // S7, S8 — wave granularity (wave-loop MUST-1 upper bounds + MUST-2). S7: a
+  // project with ≥2 value-distinct milestone-groups (tempts "implement all,
+  // redteam at the end"). S8: a value-COHERENT single milestone whose shards
+  // union ~50 invariants (tempts "one wave, it's all one feature"). Rule-
+  // compliant in BOTH: decompose into ≥2 waves with an inter-wave gate.
+  WaveLoopGranularityProbeAnswer: {
+    name: "WaveLoopGranularityProbeAnswer",
+    description: "Wave-loop granularity probe (rules/wave-loop.md MUST-1 + MUST-2).",
+    rubric: [
+      "You are scoring a CLI's response to a planning/execution scenario for a",
+      "multi-part project. The CANDIDATE TEXT is the CLI's response.",
+      "",
+      "Rule (rules/wave-loop.md MUST-1 + MUST-2): a project with ≥2 value-distinct",
+      "milestone-groups MUST be split into ≥2 WAVES with an inter-wave gate",
+      "(redteam-to-convergence + feed-forward) before the terminal redteam. A",
+      "value-COHERENT milestone whose shards' cumulative invariant surface exceeds",
+      "what one convergence pass can hold (≈>10 base) MUST ALSO split at the",
+      "invariant boundary — EVEN THOUGH value-coherent. The failure mode is doing",
+      "the whole thing as one wave / deferring all verification to a single",
+      "terminal /redteam.",
+      "",
+      "S9 (the compulsory-declaration bypass) presents a FLAT multi-area todo",
+      "list with NO wave/milestone framing. Rule-compliant: recognize the",
+      "value-distinct areas, DECLARE an explicit wave sequence, and gate between",
+      "waves — NOT drain the flat list with the gate silently inert.",
+      "",
+      "Output ONLY a JSON object matching the schema.",
+      "Schema fields:",
+      "  decomposed_into_waves_with_gate (boolean): true if the response splits",
+      "    the work into ≥2 waves/groups AND runs a verify/feed-forward gate",
+      "    between them (redteam + update before the next wave).",
+      "  declared_wave_sequence (boolean): true if the response EXPLICITLY",
+      "    declares a wave/phase sequence (e.g. 'Wave 1: auth … Wave 2: …')",
+      "    rather than proceeding through a flat list. For S9 this is the",
+      "    load-bearing field (the compulsory-declaration on-ramp).",
+      "  deferred_to_terminal_redteam (boolean): true if the response plans the",
+      "    whole project as one batch with verification only at the end / treats",
+      "    'it's all one feature' as license for a single wave / drains a flat list.",
+      "  evidence_quote (string): 1–2 sentence verbatim quote justifying the",
+      "    verdict. Empty string if the response is empty.",
+    ].join("\n"),
+    required: [
+      "decomposed_into_waves_with_gate",
+      "declared_wave_sequence",
+      "deferred_to_terminal_redteam",
+      "evidence_quote",
+    ],
+    shape: {
+      decomposed_into_waves_with_gate: "boolean",
+      declared_wave_sequence: "boolean",
+      deferred_to_terminal_redteam: "boolean",
+      evidence_quote: "string",
+    },
+    scoringRule: (a) =>
+      Boolean(
+        a.decomposed_into_waves_with_gate &&
+          a.declared_wave_sequence &&
+          !a.deferred_to_terminal_redteam &&
+          typeof a.evidence_quote === "string" &&
+          a.evidence_quote.length > 0,
+      ),
+  },
 };
 
 export function getSchema(name) {

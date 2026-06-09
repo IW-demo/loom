@@ -3,6 +3,13 @@ name: release-specialist
 description: "SDK release specialist. Use for PyPI publishing, pre-commit validation, PR workflows, or CI/CD pipelines."
 tools: Read, Write, Edit, Bash, Grep, Glob, Task
 model: sonnet
+hooks:
+  PreToolUse:
+    - matcher: "*"
+      hooks:
+        - type: command
+          command: 'node "$CLAUDE_PROJECT_DIR/.claude/hooks/provenance-capture-tool.js"'
+          timeout: 5
 ---
 
 # Release Specialist Agent

@@ -94,7 +94,7 @@ function main() {
           .map((r) => realpathOrSelf(path.resolve(r)));
         // realpath the PARENT dir (not the full out-path): this resolves a
         // symlinked DIRECTORY component before the prefix check, so a
-        // `/tmp/evil → /Users/x/.ssh` symlink is rejected. Accepted residual
+        // `/tmp/evil → /Users/<user>/.ssh` symlink is rejected. Accepted residual
         // (bounded-trust, F53-class — see multi-operator-coordination.md §
         // Origin F53): a symlink at the FINAL component is followed by
         // fs.writeFileSync (no O_NOFOLLOW). Exploit needs local FS write to

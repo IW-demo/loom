@@ -341,11 +341,11 @@ test("R4-S-01: state-io.js exports stripRepoPath helper", () => {
     "stripRepoPath MUST be exported from state-io.js",
   );
   assert(
-    stateIo.stripRepoPath("/Users/jack/repos/loom") === "loom",
+    stateIo.stripRepoPath("/Users/<user>/repos/loom") === "loom",
     "stripRepoPath strips /Users/<login>/ prefix",
   );
   assert(
-    stateIo.stripRepoPath("/home/jack/repos/loom") === "loom",
+    stateIo.stripRepoPath("/home/<user>/repos/loom") === "loom",
     "stripRepoPath strips /home/<login>/ prefix",
   );
   assert(

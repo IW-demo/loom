@@ -72,7 +72,7 @@ The structural-equivalence claim assumes (i) the GitHub instance's admin-role mu
   "type": "genesis-migration",
   "content": {
     "co_signers": [
-      { "verified_id": "ABCD..", "person_id": "pid-example-.." }  # ← same person_id; BLOCKED at fold by R6-S-04
+      { "verified_id": "ABCD..", "person_id": "pid-maintainer-.." }  # ← same person_id; BLOCKED at fold by R6-S-04
     ]
   }
 }
@@ -83,7 +83,7 @@ The structural-equivalence claim assumes (i) the GitHub instance's admin-role mu
   "type": "genesis-migration",
   "content": {
     "co_signers": [
-      { "verified_id": "ABCD..", "person_id": "pid-example-..", "github_login": "example-secondary" }  # ← same person_id; BLOCKED
+      { "verified_id": "ABCD..", "person_id": "pid-maintainer-..", "github_login": "maintainer-secondary" }  # ← same person_id; BLOCKED
     ]
   }
 }

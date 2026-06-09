@@ -3,8 +3,6 @@ name: analyst
 description: Analysis specialist. Use for failure point analysis, risk assessment, requirements breakdown, or ADRs.
 tools:
   - read_file
-  - write_file
-  - replace
   - grep_search
   - glob
   - list_directory

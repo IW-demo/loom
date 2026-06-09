@@ -11,12 +11,12 @@ labels, home paths, or service labels anywhere under this directory —
 the fixtures themselves are committed/synced artifacts and embedding a
 real token here would be the #264 leak the scanner exists to prevent.
 The flagging fixture uses `Fakename-MacStudio`, `Buildbot-Mini`,
-`acme-fixture`, `acme-enterprise`, `acme-linux-arm`, `/Users/fakeuser/`,
+`acme-fixture`, `acme-enterprise`, `acme-linux-arm`, `/Users/<user>/`,
 `com.fakeco.runner.alpha` — all invented. The Option-1 own-coordinates
 fixtures reference loom's OWN public host org and the maintainer's OWN
 dev-checkout root (per the co-owner Option-1 ruling 2026-05-17, #263);
 these are project self-coordinates, not client/3rd-party secrets, and
-the `nonown-still-flagged` fixture's `acme-corp` / `/Users/notexample/`
+the `nonown-still-flagged` fixture's `acme-corp` / `/Users/<user>/`
 tokens are invented synthetics.
 
 | Fixture                         | Scans (`--root`)                                                                                  | Expects             | Predicate locked                                                                                                   |
@@ -24,7 +24,7 @@ tokens are invented synthetics.
 | `flag-each-shape/`              | a synced tree planting all 5 structural shapes                                                    | exit 1              | each of the 5 shapes (hostname, org-slug, runner-label, home-path, service-label) flags ≥1                         |
 | `clean-foundation-placeholder/` | Foundation-public + ratified placeholder vocab                                                    | exit 0              | the positive allowlist suppresses every Foundation/placeholder token (zero findings)                               |
 | `excluded-accepted-history/`    | `SWEEP-*.md` + `journal/**` with planted shapes                                                   | exit 0              | accepted-history paths are excluded — a planted real-shape token there MUST NOT flag                               |
-| `own-org-allowed/`              | loom's own host org + own dev-home-path tokens                                                    | exit 0              | Option-1 allowlist suppresses `terrene-foundation` + `/Users/example/` self-coordinates                            |
+| `own-org-allowed/`              | loom's own host org + own dev-home-path tokens                                                    | exit 0              | Option-1 allowlist suppresses `terrene-foundation` + `/Users/<user>/` self-coordinates                            |
 | `nonown-still-flagged/`         | non-own `acme-corp/loom` + different-operator home, alongside own coords                          | exit 1              | own-org allowlist did NOT neuter detection — non-own org slug + foreign home path still flag                       |
 | `r2-org-forms/`                 | SSH-clone / `gh api orgs/` / bare / issue-ref / kailash- / coc- org forms                         | exit 1 + 6 findings | R2 must-fix #1 — every org-slug FORM flags; Foundation/own on same surface stays clean                             |
 | `r2-allowlist-anchor/`          | typosquats `terrene-foundation-evil/loom` + `nexus-enterprise-evil/loom`                          | exit 1 + 3 findings | R2 must-fix #2 — anchored allowlist no longer swallows a prefix-typosquat                                          |
@@ -33,8 +33,8 @@ tokens are invented synthetics.
 | `r3-variant-surface/`           | committed `variants/rs/rules/leakrule.md` + `*.operator.local.md` companion                       | exit 1 + 2 findings | R3 #B — variants/ ARE synced (overlay leak flags); operator.local stays excluded via suffix                        |
 | `r3-smuggle-closed/`            | `chore/<org>/loom` + `<scheme>://<org>/loom` smuggle + 9 flood vectors                            | exit 1 + 4 findings | R3 #D — branch/scheme-prefixed org smuggle CLOSED; closed-set anchor does NOT flood prose                          |
 | `f77-settings-good/`            | synced `.claude/settings.json` w/ `$CLAUDE_PROJECT_DIR`-rooted matchers only                       | exit 0              | F77 (#386) — clean settings.json passes (settings.json is now in walk surface; relative-path matchers are clean)   |
-| `f77-settings-bad/`             | synced `.claude/settings.json` w/ `Edit/Write/Read(/Users/fakeuser/...)` + `Bash(/home/...)`        | exit 1              | F77 (#386) — new settings-permission-absolute-path SHAPE fires on every tool-call matcher with an absolute path    |
-| `f77-settings-own-coords-still-flagged/` | synced `.claude/settings.json` w/ `Edit(/Users/example/...)` (own dev path)              | exit 1              | F77 (#386) — new SHAPE skips Option-1 allowlist for tool-call matchers (own/foreign distinction does not apply)    |
+| `f77-settings-bad/`             | synced `.claude/settings.json` w/ `Edit/Write/Read(/Users/<user>/...)` + `Bash(/home/...)`        | exit 1              | F77 (#386) — new settings-permission-absolute-path SHAPE fires on every tool-call matcher with an absolute path    |
+| `f77-settings-own-coords-still-flagged/` | synced `.claude/settings.json` w/ `Edit(/Users/<user>/...)` (own dev path)              | exit 1              | F77 (#386) — new SHAPE skips Option-1 allowlist for tool-call matchers (own/foreign distinction does not apply)    |
 
 ## Per-fixture detail
 
@@ -54,13 +54,13 @@ tokens are invented synthetics.
 - **`own-org-allowed/.claude/rules/owncoords.md`** — loom's own GitHub
   host org (`terrene-foundation`, `terrene-foundation/loom`,
   `github.com/terrene-foundation/loom.git`) + the maintainer's own
-  dev-home-path (`/Users/example/...`, `/home/example/...`). Per the
+  dev-home-path (`/Users/<user>/...`, `/home/<user>/...`). Per the
   co-owner Option-1 ruling 2026-05-17 (#263) these are project
   self-coordinates, not a client/3rd-party disclosure. Proves the
   Option-1 allowlist suppresses own coordinates. Expected: exit 0.
 - **`nonown-still-flagged/.claude/rules/nonown.md`** — a non-own /
   3rd-party org slug (`acme-corp/loom`), a synthetic `acme-enterprise`,
-  and a _different_ operator's home path (`/Users/notexample/...`),
+  and a _different_ operator's home path (`/Users/<user>/...`),
   placed on the SAME surface as own coordinates. Proves the Option-1
   own-org allowlist did NOT neuter genuine detection — the non-own
   tokens still flag while the adjacent own coords do not. Expected:

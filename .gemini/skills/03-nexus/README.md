@@ -128,7 +128,7 @@ Complete set of 21 Nexus skills covering all aspects from quickstart to advanced
 
 All skills created from verified sources:
 
-- .claude/agents/frameworks/nexus-specialist.md
+- .gemini/agents/frameworks/nexus-specialist.md
 
 ## Skill Dependencies
 
@@ -218,15 +218,15 @@ nexus-architecture
 
 21 skills created and verified:
 
-- Location: .claude/skills/03-nexus/
+- Location: .gemini/skills/03-nexus/
 - Total files: 21 skills + SKILL.md + README.md
 - Priority: CRITICAL (3), HIGH (12), MEDIUM (4), LOW (2)
 
 ## Related Skill Sets
 
-- **Core SDK Skills**: .claude/skills/1-core-sdk/
-- **DataFlow Skills**: .claude/skills/2-frameworks/dataflow/
-- **Kaizen Skills**: .claude/skills/2-frameworks/kaizen/
+- **Core SDK Skills**: .gemini/skills/1-core-sdk/
+- **DataFlow Skills**: .gemini/skills/2-frameworks/dataflow/
+- **Kaizen Skills**: .gemini/skills/2-frameworks/kaizen/
 
 ---
 

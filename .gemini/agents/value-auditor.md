@@ -3,8 +3,6 @@ name: value-auditor
 description: Enterprise demo QA auditor. Use for value proposition testing, narrative coherence, or data credibility checks.
 tools:
   - read_file
-  - write_file
-  - replace
   - run_shell_command
   - grep_search
   - glob

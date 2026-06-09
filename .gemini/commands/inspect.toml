@@ -21,7 +21,7 @@ Perform code inspection and analysis across Kailash ecosystem repos.
 
 ## Delegate
 
-Use **repo-ops** agent for execution.
+Use **repo-ops** agent for execution. The agent MUST resolve every target repo's on-disk path via `bin/lib/loom-links.mjs` (`resolveAll` / `resolveRepo` — canonical NAME→location binding, `cross-repo.md` MUST-1), never a positional `~/repos/<name>` / `../<name>` guess. Repos without a declared linkage are reported as not-linked, not positional-searched.
 
 ## Examples
 

@@ -179,7 +179,7 @@ See [kaizen-key-concepts](kaizen-key-concepts.md) for the 9 pipeline patterns an
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | [kaizen-wrapper-composition](kaizen-wrapper-composition.md) | WrapperBase, canonical stacking, provider protocols, SPEC-02/05/10 convergence |
 | [kaizen-provider-config-v25](kaizen-provider-config-v25.md) | BaseAgentConfig fields, Azure env vars, anti-patterns (v2.5.0)                 |
-| [kaizen-multi-provider](kaizen-multi-provider.md)           | Provider registry, protocols, CostTracker                                      |
+| kaizen-multi-provider           | Provider registry, protocols, CostTracker                                      |
 | [kaizen-delegate](kaizen-delegate.md)                       | Delegate facade (SPEC-05)                                                      |
 | [kaizen-structured-outputs](kaizen-structured-outputs.md)   | Structured output guide with migration examples                                |
 
@@ -188,14 +188,6 @@ See [kaizen-key-concepts](kaizen-key-concepts.md) for the 9 pipeline patterns an
 | File                                                  | Purpose                                    |
 | ----------------------------------------------------- | ------------------------------------------ |
 | [kaizen-testing-patterns](kaizen-testing-patterns.md) | Testing AI agents with real infrastructure |
-
-## Reference Documentation (Package Source)
-
-For in-depth guides, see the kaizen package (`docs/`):
-
-- **Core Guides**: [BaseAgent Architecture](../../../the kaizen package directory docs/guides/baseagent-architecture.md), [Multi-Agent Coordination](../../../the kaizen package directory docs/guides/multi-agent-coordination.md), [Signature Programming](../../../the kaizen package directory docs/guides/signature-programming.md), [Hooks System](../../../the kaizen package directory docs/guides/hooks-system-guide.md), [Integration Patterns](../../../the kaizen package directory docs/guides/integration-patterns.md), [Meta-Controller](../../../the kaizen package directory docs/guides/meta-controller-guide.md), [Planning System](../../../the kaizen package directory docs/guides/planning-system-guide.md)
-- **API Reference**: [API Reference](../../../the kaizen package directory docs/reference/api-reference.md), [Checkpoint](../../../the kaizen package directory docs/reference/checkpoint-api.md), [Coordination](../../../the kaizen package directory docs/reference/coordination-api.md), [Interrupts](../../../the kaizen package directory docs/reference/interrupts-api.md), [Memory](../../../the kaizen package directory docs/reference/memory-api.md), [Observability](../../../the kaizen package directory docs/reference/observability-api.md), [Planning Agents](../../../the kaizen package directory docs/reference/planning-agents-api.md), [Tools](../../../the kaizen package directory docs/reference/tools-api.md), [Configuration](../../../the kaizen package directory docs/reference/configuration.md), [Troubleshooting](../../../the kaizen package directory docs/reference/troubleshooting.md)
-- **v1.0 Developer Guides** (in the kaizen package (`docs/guides/`)): `00-native-tools-guide.md`, `01-runtime-abstraction-guide.md`, `02-local-kaizen-adapter-guide.md`, `03-memory-provider-guide.md`, `04-multi-llm-routing-guide.md`, `05-unified-agent-api-guide.md`, `06-specialist-system-guide.md`, `07-task-skill-tools-guide.md`, `08-claude-code-parity-tools-guide.md`, `09-performance-optimization-guide.md`
 
 ## Integration Patterns
 

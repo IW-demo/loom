@@ -8,7 +8,7 @@
 
 ```rust
 // DO — explicit path + verification instruction
-let worktree = "/Users/me/repos/myproject/.gemini/worktrees/agent-feature-abc123";
+let worktree = "/Users/<user>/repos/myproject/.gemini/worktrees/agent-feature-abc123";
 
 @ml-specialist
 isolation: worktree
@@ -56,7 +56,7 @@ isolation: worktree
 prompt: "Edit packages/kailash-ml/src/trainable.rs at line 370..."
 
 // DO — absolute paths anchored to the PINNED worktree path (Rule 1 style)
-let worktree = "/Users/me/repos/myproject/.gemini/worktrees/agent-feature-abc123";
+let worktree = "/Users/<user>/repos/myproject/.gemini/worktrees/agent-feature-abc123";
 
 @ml-specialist
 isolation: worktree
@@ -65,7 +65,7 @@ prompt: "Edit {worktree}/packages/kailash-ml/src/trainable.rs at line 370..."
 // DO NOT — absolute paths pointing to the PARENT checkout
 @ml-specialist
 isolation: worktree
-prompt: "Edit /Users/me/repos/myproject/packages/kailash-ml/src/trainable.rs at line 370..."
+prompt: "Edit /Users/<user>/repos/myproject/packages/kailash-ml/src/trainable.rs at line 370..."
 // ↑ writes land in the MAIN checkout; the worktree stays empty; auto-cleanup
 //   deletes the empty worktree; agent's work is either silently on main OR lost.
 ```

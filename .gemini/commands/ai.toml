@@ -1,5 +1,5 @@
 name = "ai"
-description = "Loom command: ai"
+description = "Kaizen quick reference: BaseAgent, Signature, Delegate, multi-agent, RAG, trust, governance."
 prompt = '''
 # /ai - Kaizen Quick Reference
 
@@ -79,6 +79,6 @@ When working with Kaizen, deploy:
 
 ## Skill Reference
 
-This command loads: `.claude/skills/04-kaizen/SKILL.md`
+This command loads: `.gemini/skills/04-kaizen/SKILL.md`
 '''
 tools = ["read_file", "glob", "grep_search", "list_directory", "run_shell_command", "write_file"]

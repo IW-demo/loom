@@ -148,6 +148,6 @@ workflow.add_node("UserUpdateNode", "update", {
 
 ## Full Documentation
 
-- `.claude/skills/02-dataflow/SKILL.md` -- Complete DataFlow skill index
-- `.claude/skills/02-dataflow/dataflow-advanced-patterns.md` -- Advanced patterns
-- `.claude/skills/03-nexus/nexus-dataflow-integration.md` -- Nexus integration
+- `.gemini/skills/02-dataflow/SKILL.md` -- Complete DataFlow skill index
+- `.gemini/skills/02-dataflow/dataflow-advanced-patterns.md` -- Advanced patterns
+- `.gemini/skills/03-nexus/nexus-dataflow-integration.md` -- Nexus integration

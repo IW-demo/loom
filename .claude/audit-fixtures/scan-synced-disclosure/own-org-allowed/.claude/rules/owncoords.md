@@ -8,8 +8,8 @@ Own host org: terrene-foundation, terrene-foundation/loom,
 github.com/terrene-foundation/loom.git, gh api repos/terrene-foundation/kailash-py.
 Tracking issue self-ref: terrene-foundation/loom#21.
 
-Own dev-home-path: /Users/example/repos/loom, /home/example/repos/loom,
-posture report `Repo: /Users/example/repos/loom`.
+Own dev-home-path: /Users/<user>/repos/loom, /home/<user>/repos/loom,
+posture report `Repo: /Users/<user>/repos/loom`.
 
 These are the project's own coordinates — public host org + maintainer
 checkout root — not a client codename, third-party org, or a different

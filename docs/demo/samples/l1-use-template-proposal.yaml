@@ -1,0 +1,22 @@
+# L1 rehearsal — USE-template origination proposal (iw-coc-template → loom Gate-1)
+# Copy to iw-coc-template/.claude/.proposals/latest.yaml to rehearse live.
+# DO NOT distribute (Gate-2 /sync) without operator approval.
+#
+# Narrative: engineer correction (L2 journal) → /codify on template → /sync at loom
+# → iw-dept-consulting inherits rules/iw-data-classification.md
+
+source_repo: IW-coc-template
+origin: use-template
+codify_date: 2026-06-14
+codify_session: "feat(iw-demo): strengthen clerk-role Restricted field block from learn loop"
+template_version: "0.1.0"
+coc_version: "0.1.0"
+
+changes:
+  - file: .claude/rules/iw-data-classification.md
+    action: modified
+    suggested_tier: coc
+    reason: "User correction during E3 rehearsal — clerk API responses must not include Restricted fields; codify from learning digest"
+    diff_lines: "+12 -2"
+
+status: pending_review

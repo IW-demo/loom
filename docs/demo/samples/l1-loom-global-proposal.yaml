@@ -1,0 +1,24 @@
+# L1 rehearsal — optional global rule tweak at loom (cc tier)
+# Copy to loom/.claude/.proposals/latest.yaml to rehearse Gate-1 classify only.
+# DO NOT merge or run Gate-2 /sync without operator approval.
+#
+# See ARCHITECTURE_OPS.md § L1 optional global beat.
+
+source_repo: loom
+origin: loom
+upstream_target: atelier
+codify_date: 2026-06-15
+codify_session: "docs(demo): add demo documentation commit scope to git.md"
+loom_version: "2.9.5"
+coc_version: "2.9.5"
+
+changes:
+  - file: rules/git.md
+    action: modified
+    suggested_tier: cc
+    canonical_path: .claude/rules/git.md
+    reason: "IW pitch rehearsal — grep-filterable docs(demo): scope for demo script commits under docs/demo/**"
+    adaptation_notes: "Neutral-body slot only; no variant overlay"
+    diff_lines: "+8 -0"
+
+status: pending_review

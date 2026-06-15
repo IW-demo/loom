@@ -20,6 +20,19 @@ fix(api): resolve rate limiting issue
 
 **Why:** Non-conventional commits break automated changelog generation and make `git log --oneline` useless for release notes.
 
+### Demo Documentation Scope (IW rehearsal)
+
+Commits that only touch `docs/demo/**` SHOULD use scope `demo`, e.g. `docs(demo): architecture ops script L1–T1`.
+
+```bash
+# DO — demo script commits are grep-filterable during pitch rehearsal
+git commit -m "docs(demo): architecture ops script L1–T1"
+# DO NOT — mixes demo scripts into product changelog scopes
+git commit -m "docs(loom): architecture ops script L1–T1"
+```
+
+**Why:** Operate-tier `/inspect` and retainer audits can filter demo-only churn without conflating pitch materials with artifact-framework releases. Rehearsal proposal: `docs/demo/samples/l1-loom-global-proposal.yaml` (Gate-1 only — do not distribute without approval).
+
 ## Branch Naming
 
 Format: `type/description` (e.g., `feat/add-auth`, `fix/api-timeout`).
